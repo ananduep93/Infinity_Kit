@@ -23,13 +23,6 @@ const baseFolders = [
         tools: ['unitconverter', 'passwordgen', 'passwordsaver', 'passwordstrength', 'randomnamepicker']
     },
     {
-        id: 'productivity',
-        name: 'Productivity',
-        icon: '📚',
-        emoji: '📚',
-        tools: ['focustimer', 'studyplanner']
-    },
-    {
         id: 'smart-tools',
         name: 'Smart Tools',
         icon: '🤖',
@@ -105,27 +98,6 @@ const baseFolders = [
         icon: '📊',
         emoji: '📊',
         tools: ['graphmaker', 'averagecalculator', 'numbersorter', 'csvviewer']
-    },
-    {
-        id: 'search-tools',
-        name: 'Search Tools',
-        icon: '🔍',
-        emoji: '🔍',
-        tools: ['texthighlighter', 'keywordcounter', 'autocompletertool']
-    },
-    {
-        id: 'format-tools',
-        name: 'Format Tools',
-        icon: '🧾',
-        emoji: '🧾',
-        tools: ['removelinebreaks', 'addlinenumbers', 'textaligner', 'paragraphsplitter']
-    },
-    {
-        id: 'storage-tools',
-        name: 'Storage Tools',
-        icon: '💾',
-        emoji: '💾',
-        tools: ['localnotessaver', 'localpasswordsaver', 'clipboardhistory']
     },
     {
         id: 'decision-tools',
@@ -207,20 +179,6 @@ const tools = [
         name: 'Timer & Stopwatch',
         icon: '⏱️',
         description: 'Track time'
-    },
-    {
-        id: 'focustimer',
-        name: 'Focus Timer',
-        icon: '⏲️',
-        description: 'Pomodoro Timer',
-        comingSoon: true
-    },
-    {
-        id: 'studyplanner',
-        name: 'Study Planner',
-        icon: '📖',
-        description: 'Plan your studies',
-        comingSoon: true
     },
     {
         id: 'aiplanner',
@@ -431,50 +389,6 @@ const tools = [
         icon: '📋',
         description: 'View CSV files as table'
     },
-    // Search Tools
-    {
-        id: 'texthighlighter',
-        name: 'Text Highlighter',
-        icon: '🔍',
-        description: 'Highlight matching text'
-    },
-    {
-        id: 'keywordcounter',
-        name: 'Keyword Counter',
-        icon: '📂',
-        description: 'Count word occurrences'
-    },
-    {
-        id: 'autocompletertool',
-        name: 'Autocomplete Tool',
-        icon: '🔠',
-        description: 'Smart word suggestions'
-    },
-    // Format Tools
-    {
-        id: 'removelinebreaks',
-        name: 'Remove Line Breaks',
-        icon: '🧹',
-        description: 'Convert to single line'
-    },
-    {
-        id: 'addlinenumbers',
-        name: 'Add Line Numbers',
-        icon: '🔄',
-        description: 'Number each line'
-    },
-    {
-        id: 'textaligner',
-        name: 'Text Aligner',
-        icon: '📏',
-        description: 'Align text formatting'
-    },
-    {
-        id: 'paragraphsplitter',
-        name: 'Paragraph Splitter',
-        icon: '🧱',
-        description: 'Split into paragraphs'
-    },
     // Math Tools (additions)
     {
         id: 'lcmhcf',
@@ -499,25 +413,6 @@ const tools = [
         name: 'Equation Solver',
         icon: '🧮',
         description: 'Solve basic equations'
-    },
-    // Storage Tools
-    {
-        id: 'localnotessaver',
-        name: 'Local Notes Saver',
-        icon: '📝',
-        description: 'Save notes locally'
-    },
-    {
-        id: 'localpasswordsaver',
-        name: 'Local Password Saver',
-        icon: '🔐',
-        description: 'Store passwords locally'
-    },
-    {
-        id: 'clipboardhistory',
-        name: 'Clipboard History',
-        icon: '📋',
-        description: 'Save clipboard items'
     },
     // Decision Tools
     {
@@ -899,29 +794,6 @@ function openTool(toolId, toolName, toolIcon) {
         case 'csvviewer':
             loadCSVViewer();
             break;
-        // Search Tools
-        case 'texthighlighter':
-            loadTextHighlighter();
-            break;
-        case 'keywordcounter':
-            loadKeywordCounter();
-            break;
-        case 'autocompletertool':
-            loadAutocompleteTool();
-            break;
-        // Format Tools
-        case 'removelinebreaks':
-            loadRemoveLineBreaks();
-            break;
-        case 'addlinenumbers':
-            loadAddLineNumbers();
-            break;
-        case 'textaligner':
-            loadTextAligner();
-            break;
-        case 'paragraphsplitter':
-            loadParagraphSplitter();
-            break;
         // Math Tools
         case 'lcmhcf':
             loadLCMHCF();
@@ -934,16 +806,6 @@ function openTool(toolId, toolName, toolIcon) {
             break;
         case 'equationsolver':
             loadEquationSolver();
-            break;
-        // Storage Tools
-        case 'localnotessaver':
-            loadLocalNotesSaver();
-            break;
-        case 'localpasswordsaver':
-            loadLocalPasswordSaver();
-            break;
-        case 'clipboardhistory':
-            loadClipboardHistory();
             break;
         // Decision Tools
         case 'spinwheel':
@@ -4139,229 +4001,7 @@ function viewCSV() {
 }
 
 // ==================== NEW TOOLS - SEARCH TOOLS ====================
-function loadTextHighlighter() {
-    let html = `
-        <div class="tool-form">
-            <h3>🔍 Text Highlighter</h3>
-            <div class="form-group">
-                <label>Enter keyword to highlight</label>
-                <input type="text" id="highlightKeyword" placeholder="e.g., hello" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; margin-bottom: 10px;">
-            </div>
-            <div class="form-group">
-                <label>Enter text</label>
-                <textarea id="highlightText" placeholder="Enter text..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; resize: vertical; min-height: 120px;"></textarea>
-            </div>
-            <button onclick="highlightText()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold; margin-bottom: 15px;">Highlight</button>
-            <div id="highlightResult" style="padding: 15px; background: white; border-radius: 8px; line-height: 1.8;"></div>
-        </div>
-    `;
-    toolContent.innerHTML = html;
-}
-
-function highlightText() {
-    const keyword = document.getElementById('highlightKeyword').value;
-    const text = document.getElementById('highlightText').value;
-    
-    if (!keyword) {
-        showToast('⚠️ Enter a keyword', 'error');
-        return;
-    }
-    
-    const regex = new RegExp(`(${keyword})`, 'gi');
-    const highlighted = text.replace(regex, '<mark style="background-color: yellow; padding: 2px;"><strong>$1</strong></mark>');
-    
-    document.getElementById('highlightResult').innerHTML = highlighted;
-    showToast('✓ Text highlighted!', 'success');
-}
-
-function loadKeywordCounter() {
-    let html = `
-        <div class="tool-form">
-            <h3>📂 Keyword Counter</h3>
-            <div class="form-group">
-                <label>Enter keyword</label>
-                <input type="text" id="countKeyword" placeholder="e.g., the" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; margin-bottom: 10px;">
-            </div>
-            <div class="form-group">
-                <label>Enter text</label>
-                <textarea id="countText" placeholder="Enter text..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; resize: vertical; min-height: 120px;"></textarea>
-            </div>
-            <button onclick="countKeyword()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold; margin-bottom: 15px;">Count</button>
-            <div style="padding: 15px; background: white; border-radius: 8px; text-align: center;">
-                <div style="color: #666; margin-bottom: 8px;">Count Result</div>
-                <div id="countResult" style="font-size: 2rem; font-weight: bold; color: #667eea;">-</div>
-            </div>
-        </div>
-    `;
-    toolContent.innerHTML = html;
-}
-
-function countKeyword() {
-    const keyword = document.getElementById('countKeyword').value;
-    const text = document.getElementById('countText').value;
-    
-    if (!keyword) {
-        showToast('⚠️ Enter a keyword', 'error');
-        return;
-    }
-    
-    const regex = new RegExp(keyword, 'gi');
-    const matches = text.match(regex) || [];
-    
-    document.getElementById('countResult').textContent = matches.length;
-    showToast('✓ Counted!', 'success');
-}
-
-function loadAutocompletertool() {
-    let html = `
-        <div class="tool-form">
-            <h3>🔠 Autocomplete Tool</h3>
-            <div class="form-group">
-                <label>Type to get suggestions</label>
-                <input type="text" id="autocompleteInput" placeholder="Start typing..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; margin-bottom: 10px;" oninput="showAutocompleteSuggestions()">
-            </div>
-            <div style="padding: 15px; background: white; border-radius: 8px;">
-                <div style="color: #666; margin-bottom: 8px;">Suggestions</div>
-                <div id="autocompleteSuggestions" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;"></div>
-            </div>
-        </div>
-    `;
-    toolContent.innerHTML = html;
-    window.autocompleteWords = ['apple', 'application', 'about', 'above', 'absolute', 'button', 'batch', 'brother', 'background', 'broken', 'computer', 'catalog', 'category', 'captain', 'certain', 'database', 'data', 'delayed', 'define', 'depend', 'elephant', 'electric', 'enhance', 'example', 'energy', 'father', 'factor', 'feature', 'filter', 'forward'];
-}
-
-function showAutocompleteSuggestions() {
-    const input = document.getElementById('autocompleteInput').value.toLowerCase();
-    const suggestions = window.autocompleteWords.filter(w => w.startsWith(input) && input.length > 0).slice(0, 8);
-    
-    const container = document.getElementById('autocompleteSuggestions');
-    container.innerHTML = '';
-    suggestions.forEach(word => {
-        const btn = document.createElement('button');
-        btn.textContent = word;
-        btn.style.cssText = 'padding: 10px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;';
-        btn.onclick = () => {
-            document.getElementById('autocompleteInput').value = word;
-            container.innerHTML = '';
-        };
-        container.appendChild(btn);
-    });
-}
-
 // ==================== NEW TOOLS - FORMAT TOOLS ====================
-function loadRemoveLineBreaks() {
-    let html = `
-        <div class="tool-form">
-            <h3>🧹 Remove Line Breaks</h3>
-            <div class="form-group">
-                <label>Enter text with line breaks</label>
-                <textarea id="linebreakInput" placeholder="Enter multiline text..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; resize: vertical; min-height: 120px;"></textarea>
-            </div>
-            <button onclick="removeLineBreaks()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold; margin-bottom: 15px;">Convert to Single Line</button>
-            <div style="padding: 15px; background: white; border-radius: 8px;">
-                <textarea id="linebreakOutput" readonly style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; resize: vertical; min-height: 80px; background: #f5f7fa;"></textarea>
-                <button onclick="copyLinebreakText()" style="width: 100%; margin-top: 10px; padding: 10px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer;">📋 Copy Result</button>
-            </div>
-        </div>
-    `;
-    toolContent.innerHTML = html;
-}
-
-function removeLineBreaks() {
-    const input = document.getElementById('linebreakInput').value;
-    const output = input.replace(/\\n/g, ' ').replace(/\\r/g, '').replace(/\\s+/g, ' ');
-    document.getElementById('linebreakOutput').value = output;
-    showToast('✓ Line breaks removed!', 'success');
-}
-
-function copyLinebreakText() {
-    const text = document.getElementById('linebreakOutput').value;
-    navigator.clipboard.writeText(text).then(() => showToast('✓ Copied!', 'success'));
-}
-
-function loadAddLineNumbers() {
-    let html = `
-        <div class="tool-form">
-            <h3>🔄 Add Line Numbers</h3>
-            <div class="form-group">
-                <label>Enter text</label>
-                <textarea id="linenumberInput" placeholder="Enter text..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; resize: vertical; min-height: 120px;"></textarea>
-            </div>
-            <button onclick="addLineNumbers()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold; margin-bottom: 15px;">Add Numbers</button>
-            <div style="padding: 15px; background: white; border-radius: 8px;">
-                <textarea id="linenumberOutput" readonly style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; font-family: monospace; resize: vertical; min-height: 120px; background: #f5f7fa;"></textarea>
-                <button onclick="copyLinenumberText()" style="width: 100%; margin-top: 10px; padding: 10px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer;">📋 Copy Result</button>
-            </div>
-        </div>
-    `;
-    toolContent.innerHTML = html;
-}
-
-function addLineNumbers() {
-    const input = document.getElementById('linenumberInput').value;
-    const lines = input.split('\\n');
-    const numbered = lines.map((line, i) => `${(i+1).toString().padStart(3, ' ')}. ${line}`).join('\\n');
-    document.getElementById('linenumberOutput').value = numbered;
-    showToast('✓ Line numbers added!', 'success');
-}
-
-function copyLinenumberText() {
-    const text = document.getElementById('linenumberOutput').value;
-    navigator.clipboard.writeText(text).then(() => showToast('✓ Copied!', 'success'));
-}
-
-function loadTextAligner() {
-    let html = `
-        <div class="tool-form">
-            <h3>📏 Text Aligner</h3>
-            <div class="form-group">
-                <label>Enter text</label>
-                <textarea id="alignInput" placeholder="Enter text..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; resize: vertical; min-height: 120px;"></textarea>
-            </div>
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px;">
-                <button onclick="alignText('left')" style="padding: 12px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Align Left ⬅️</button>
-                <button onclick="alignText('center')" style="padding: 12px; background: #764ba2; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Center ⏺️</button>
-                <button onclick="alignText('right')" style="padding: 12px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Align Right ➡️</button>
-            </div>
-            <div id="alignResult" style="padding: 15px; background: white; border-radius: 8px; min-height: 100px;"></div>
-        </div>
-    `;
-    toolContent.innerHTML = html;
-}
-
-function alignText(alignment) {
-    const input = document.getElementById('alignInput').value;
-    const lines = input.split('\\n');
-    const result = document.getElementById('alignResult');
-    result.style.textAlign = alignment;
-    result.textContent = input.split('\\n').join('\\n');
-    showToast(`✓ Text aligned ${alignment}!`, 'success');
-}
-
-function loadParagraphSplitter() {
-    let html = `
-        <div class="tool-form">
-            <h3>🧱 Paragraph Splitter</h3>
-            <div class="form-group">
-                <label>Enter text (separate paragraphs with . . .)</label>
-                <textarea id="paragraphInput" placeholder="Enter text..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; resize: vertical; min-height: 120px;"></textarea>
-            </div>
-            <button onclick="splitParagraphs()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold; margin-bottom: 15px;">Split Paragraphs</button>
-            <div id="paragraphResult" style="padding: 15px; background: white; border-radius: 8px;"></div>
-        </div>
-    `;
-    toolContent.innerHTML = html;
-}
-
-function splitParagraphs() {
-    const input = document.getElementById('paragraphInput').value;
-    const paragraphs = input.split('...').map(p => p.trim()).filter(p => p);
-    
-    const result = document.getElementById('paragraphResult');
-    result.innerHTML = paragraphs.map((p, i) => `<div style="margin-bottom: 15px; padding: 12px; background: #f5f7fa; border-radius: 6px; border-left: 4px solid #667eea;"><strong>¶ ${i+1}:</strong><br>${p}</div>`).join('');
-    showToast('✓ Paragraphs split!', 'success');
-}
-
 // ==================== NEW TOOLS - MATH TOOLS ====================
 function loadLCMHCF() {
     let html = `
@@ -4544,165 +4184,6 @@ function solveEquation() {
     const x = -b / a;
     document.getElementById('equationResult').textContent = x.toFixed(2);
     showToast('✓ Solved!', 'success');
-}
-
-// ==================== NEW TOOLS - STORAGE TOOLS ====================
-function loadLocalNotesSaver() {
-    const notes = JSON.parse(localStorage.getItem('infinityNotes')) || [];
-    let html = `
-        <div class="tool-form">
-            <h3>📝 Local Notes Saver</h3>
-            <div class="form-group">
-                <input type="text" id="noteTitle" placeholder="Note title..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; margin-bottom: 10px;">
-                <textarea id="noteContent" placeholder="Write your note..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; resize: vertical; min-height: 120px;"></textarea>
-            </div>
-            <button onclick="saveNote()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold; margin-bottom: 15px;">Save Note</button>
-            <div id="notesList" style="display: grid; gap: 10px;"></div>
-        </div>
-    `;
-    toolContent.innerHTML = html;
-    renderNotes();
-}
-
-function saveNote() {
-    const title = document.getElementById('noteTitle').value;
-    const content = document.getElementById('noteContent').value;
-    
-    if (!title || !content) {
-        showToast('⚠️ Enter title and content', 'error');
-        return;
-    }
-    
-    const notes = JSON.parse(localStorage.getItem('infinityNotes')) || [];
-    notes.push({id: Date.now(), title, content});
-    localStorage.setItem('infinityNotes', JSON.stringify(notes));
-    
-    document.getElementById('noteTitle').value = '';
-    document.getElementById('noteContent').value = '';
-    renderNotes();
-    showToast('✓ Note saved!', 'success');
-}
-
-function renderNotes() {
-    const notes = JSON.parse(localStorage.getItem('infinityNotes')) || [];
-    const list = document.getElementById('notesList');
-    list.innerHTML = notes.map(note => `
-        <div style="padding: 12px; background: #f5f7fa; border-left: 4px solid #667eea; border-radius: 6px;">
-            <div style="font-weight: bold; margin-bottom: 5px;">${note.title}</div>
-            <div style="font-size: 0.9rem; color: #666; margin-bottom: 8px;">${note.content.substring(0, 50)}...</div>
-            <button onclick="deleteNote(${note.id})" style="padding: 6px 12px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Delete</button>
-        </div>
-    `).join('');
-}
-
-function deleteNote(id) {
-    const notes = JSON.parse(localStorage.getItem('infinityNotes')) || [];
-    const filtered = notes.filter(n => n.id !== id);
-    localStorage.setItem('infinityNotes', JSON.stringify(filtered));
-    renderNotes();
-    showToast('✓ Note deleted!', 'success');
-}
-
-function loadLocalPasswordSaver() {
-    let html = `
-        <div class="tool-form">
-            <h3>🔐 Local Password Saver (Demo - Not Encrypted)</h3>
-            <div class="form-group" style="background: #fff3cd; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9rem;">⚠️ WARNING: For demo only. Use real password managers for security.</div>
-            <input type="text" id="passTitle" placeholder="Service/Site name..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; margin-bottom: 10px;">
-            <input type="text" id="passUsername" placeholder="Username..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; margin-bottom: 10px;">
-            <input type="password" id="passPassword" placeholder="Password..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; margin-bottom: 10px;">
-            <button onclick="savePassword()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold; margin-bottom: 15px;">Save Password</button>
-            <div id="passwordsList" style="display: grid; gap: 10px;"></div>
-        </div>
-    `;
-    toolContent.innerHTML = html;
-    renderPasswords();
-}
-
-function savePassword() {
-    const title = document.getElementById('passTitle').value;
-    const username = document.getElementById('passUsername').value;
-    const password = document.getElementById('passPassword').value;
-    
-    if (!title || !username || !password) {
-        showToast('⚠️ Fill all fields', 'error');
-        return;
-    }
-    
-    const passwords = JSON.parse(localStorage.getItem('infinityPasswords')) || [];
-    passwords.push({id: Date.now(), title, username, password});
-    localStorage.setItem('infinityPasswords', JSON.stringify(passwords));
-    
-    document.getElementById('passTitle').value = '';
-    document.getElementById('passUsername').value = '';
-    document.getElementById('passPassword').value = '';
-    renderPasswords();
-    showToast('✓ Password saved!', 'success');
-}
-
-function renderPasswords() {
-    const passwords = JSON.parse(localStorage.getItem('infinityPasswords')) || [];
-    const list = document.getElementById('passwordsList');
-    list.innerHTML = passwords.map(pass => `
-        <div style="padding: 12px; background: #f5f7fa; border-left: 4px solid #dc3545; border-radius: 6px;">
-            <div style="font-weight: bold; margin-bottom: 5px;">${pass.title}</div>
-            <div style="font-size: 0.9rem; color: #666; margin-bottom: 5px;">👤 ${pass.username}</div>
-            <div style="font-size: 0.9rem; color: #666; margin-bottom: 8px;">🔑 ${'*'.repeat(pass.password.length)}</div>
-            <button onclick="deletePassword(${pass.id})" style="padding: 6px 12px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Delete</button>
-        </div>
-    `).join('');
-}
-
-function deletePassword(id) {
-    const passwords = JSON.parse(localStorage.getItem('infinityPasswords')) || [];
-    const filtered = passwords.filter(p => p.id !== id);
-    localStorage.setItem('infinityPasswords', JSON.stringify(filtered));
-    renderPasswords();
-    showToast('✓ Password deleted!', 'success');
-}
-
-function loadClipboardHistory() {
-    let html = `
-        <div class="tool-form">
-            <h3>📋 Clipboard History (Session)</h3>
-            <div class="form-group">
-                <label>Copy text, then paste items from history</label>
-                <textarea id="clipboardInput" placeholder="Paste something..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; resize: vertical; min-height: 80px;"></textarea>
-            </div>
-            <button onclick="addToClipboardHistory()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold; margin-bottom: 15px;">Save to History</button>
-            <div style="margin-bottom: 15px;">
-                <div style="font-weight: bold; margin-bottom: 8px;">History</div>
-                <div id="clipboardHistory" style="display: grid; gap: 8px;"></div>
-            </div>
-        </div>
-    `;
-    toolContent.innerHTML = html;
-    window.clipboardItems = [];
-    renderClipboardHistory();
-}
-
-function addToClipboardHistory() {
-    const text = document.getElementById('clipboardInput').value;
-    if (!text) return;
-    
-    window.clipboardItems.unshift({id: Date.now(), text});
-    if (window.clipboardItems.length > 10) window.clipboardItems.pop();
-    renderClipboardHistory();
-    showToast('✓ Added to history!', 'success');
-}
-
-function renderClipboardHistory() {
-    const history = document.getElementById('clipboardHistory');
-    history.innerHTML = window.clipboardItems.map(item => `
-        <div style="padding: 10px; background: #f5f7fa; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 0.9rem; color: #666;">${item.text.substring(0, 30)}...</span>
-            <button onclick="copyClipboardItem('${item.text.replace(/'/g, "\\'")}')" style="padding: 6px 12px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Copy</button>
-        </div>
-    `).join('');
-}
-
-function copyClipboardItem(text) {
-    navigator.clipboard.writeText(text).then(() => showToast('✓ Copied!', 'success'));
 }
 
 // ==================== NEW TOOLS - DECISION TOOLS ====================
