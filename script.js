@@ -54,7 +54,7 @@ const folders = [
         name: 'Math Tools',
         icon: '📊',
         emoji: '📊',
-        tools: ['discountcalc', 'percentagecalc']
+        tools: ['discountcalc', 'percentagecalc', 'primenumber', 'palindrome', 'factorial', 'fibonacci']
     },
     {
         id: 'time-tools',
@@ -83,6 +83,13 @@ const folders = [
         icon: '⚡',
         emoji: '⚡',
         tools: ['texttospeech']
+    },
+    {
+        id: 'writing-tools',
+        name: 'Writing Tools',
+        icon: '✍️',
+        emoji: '✍️',
+        tools: ['wordcounter', 'textreverse', 'caseconverter', 'removeduplicates']
     }
 ];
 
@@ -272,6 +279,54 @@ const tools = [
         name: 'Text to Speech',
         icon: '🔊',
         description: 'Convert text to speech'
+    },
+    {
+        id: 'primenumber',
+        name: 'Prime Number Checker',
+        icon: '🔢',
+        description: 'Check if number is prime'
+    },
+    {
+        id: 'palindrome',
+        name: 'Palindrome Checker',
+        icon: '🔁',
+        description: 'Check if text is palindrome'
+    },
+    {
+        id: 'factorial',
+        name: 'Factorial Calculator',
+        icon: '📊',
+        description: 'Calculate factorial (n!)'
+    },
+    {
+        id: 'fibonacci',
+        name: 'Fibonacci Generator',
+        icon: '🔢',
+        description: 'Generate Fibonacci sequence'
+    },
+    {
+        id: 'wordcounter',
+        name: 'Word Counter',
+        icon: '🔤',
+        description: 'Count words and characters'
+    },
+    {
+        id: 'textreverse',
+        name: 'Text Reverser',
+        icon: '🔁',
+        description: 'Reverse text instantly'
+    },
+    {
+        id: 'caseconverter',
+        name: 'Case Converter',
+        icon: '🔠',
+        description: 'Change text case'
+    },
+    {
+        id: 'removeduplicates',
+        name: 'Remove Duplicate Words',
+        icon: '🧹',
+        description: 'Remove repeated words'
     }
 ];
 
@@ -652,6 +707,30 @@ function openTool(toolId, toolName, toolIcon) {
             break;
         case 'texttospeech':
             loadTextToSpeech();
+            break;
+        case 'primenumber':
+            loadPrimeChecker();
+            break;
+        case 'palindrome':
+            loadPalindromeChecker();
+            break;
+        case 'factorial':
+            loadFactorialCalculator();
+            break;
+        case 'fibonacci':
+            loadFibonacciGenerator();
+            break;
+        case 'wordcounter':
+            loadWordCounter();
+            break;
+        case 'textreverse':
+            loadTextReverser();
+            break;
+        case 'caseconverter':
+            loadCaseConverter();
+            break;
+        case 'removeduplicates':
+            loadRemoveDuplicates();
             break;
     }
 
@@ -2760,6 +2839,333 @@ function stopSpeech() {
     if ('speechSynthesis' in window) {
         speechSynthesis.cancel();
         showToast('Speech stopped', 'info');
+    }
+}
+
+// ========== PRIME NUMBER CHECKER ==========
+function loadPrimeChecker() {
+    let html = `
+        <div class="tool-form">
+            <h3>🔢 Prime Number Checker</h3>
+            <div class="form-group">
+                <label>Enter Number</label>
+                <input type="number" id="primeInput" placeholder="Enter a number" min="2" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;">
+            </div>
+            <button onclick="checkPrime()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold;">Check Prime</button>
+            <div id="primeResult" style="display: none; background: white; padding: 20px; border-radius: 8px; margin-top: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center;">
+                <div style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">Result</div>
+                <div id="primeStatus" style="font-size: 2rem; font-weight: bold; color: #667eea;">-</div>
+            </div>
+        </div>
+    `;
+    toolContent.innerHTML = html;
+}
+
+function checkPrime() {
+    const num = parseInt(document.getElementById('primeInput').value);
+    if (isNaN(num) || num < 2) {
+        showToast('Please enter a number greater than 1', 'error');
+        return;
+    }
+    
+    let isPrime = true;
+    if (num === 2) isPrime = true;
+    else if (num % 2 === 0) isPrime = false;
+    else {
+        for (let i = 3; i <= Math.sqrt(num); i += 2) {
+            if (num % i === 0) {
+                isPrime = false;
+                break;
+            }
+        }
+    }
+    
+    const status = isPrime ? '✓ Prime' : '✗ Not Prime';
+    const color = isPrime ? '#28a745' : '#dc3545';
+    document.getElementById('primeResult').style.display = 'block';
+    document.getElementById('primeStatus').textContent = status;
+    document.getElementById('primeStatus').style.color = color;
+    showToast(status, isPrime ? 'success' : 'info');
+}
+
+// ========== PALINDROME CHECKER ==========
+function loadPalindromeChecker() {
+    let html = `
+        <div class="tool-form">
+            <h3>🔁 Palindrome Checker</h3>
+            <div class="form-group">
+                <label>Enter Text or Number</label>
+                <input type="text" id="palindromeInput" placeholder="e.g., 121 or racecar" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;">
+            </div>
+            <button onclick="checkPalindrome()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold;">Check Palindrome</button>
+            <div id="palindromeResult" style="display: none; background: white; padding: 20px; border-radius: 8px; margin-top: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center;">
+                <div style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">Result</div>
+                <div id="palindromeStatus" style="font-size: 2rem; font-weight: bold; color: #667eea;">-</div>
+            </div>
+        </div>
+    `;
+    toolContent.innerHTML = html;
+}
+
+function checkPalindrome() {
+    const input = document.getElementById('palindromeInput').value.trim();
+    if (!input) {
+        showToast('Please enter text or number', 'error');
+        return;
+    }
+    
+    const cleaned = input.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const reversed = cleaned.split('').reverse().join('');
+    const isPalindrome = cleaned === reversed;
+    
+    const status = isPalindrome ? '✓ Palindrome' : '✗ Not Palindrome';
+    const color = isPalindrome ? '#28a745' : '#dc3545';
+    document.getElementById('palindromeResult').style.display = 'block';
+    document.getElementById('palindromeStatus').textContent = status;
+    document.getElementById('palindromeStatus').style.color = color;
+    showToast(status, isPalindrome ? 'success' : 'info');
+}
+
+// ========== FACTORIAL CALCULATOR ==========
+function loadFactorialCalculator() {
+    let html = `
+        <div class="tool-form">
+            <h3>📊 Factorial Calculator</h3>
+            <div class="form-group">
+                <label>Enter Number (n!)</label>
+                <input type="number" id="factorialInput" placeholder="e.g., 5" min="0" max="20" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;">
+            </div>
+            <button onclick="calculateFactorial()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold;">Calculate Factorial</button>
+            <div id="factorialResult" style="display: none; background: white; padding: 20px; border-radius: 8px; margin-top: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <div style="font-size: 0.85rem; color: #666; margin-bottom: 8px;">Result</div>
+                <div id="factorialValue" style="font-size: 2rem; font-weight: bold; color: #667eea; word-break: break-all;">0</div>
+            </div>
+        </div>
+    `;
+    toolContent.innerHTML = html;
+}
+
+function calculateFactorial() {
+    const num = parseInt(document.getElementById('factorialInput').value);
+    if (isNaN(num) || num < 0) {
+        showToast('Please enter a non-negative number', 'error');
+        return;
+    }
+    if (num > 20) {
+        showToast('Maximum value is 20', 'error');
+        return;
+    }
+    
+    let result = 1;
+    for (let i = 2; i <= num; i++) {
+        result *= i;
+    }
+    
+    document.getElementById('factorialResult').style.display = 'block';
+    document.getElementById('factorialValue').textContent = num + '! = ' + result;
+    showToast('✓ Factorial calculated!', 'success');
+}
+
+// ========== FIBONACCI GENERATOR ==========
+function loadFibonacciGenerator() {
+    let html = `
+        <div class="tool-form">
+            <h3>🔢 Fibonacci Generator</h3>
+            <div class="form-group">
+                <label>Number of Terms</label>
+                <input type="number" id="fibonacciTerms" placeholder="e.g., 5" min="1" max="30" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;">
+            </div>
+            <button onclick="generateFibonacci()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold;">Generate Sequence</button>
+            <div id="fibonacciResult" style="display: none; background: white; padding: 20px; border-radius: 8px; margin-top: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <div style="font-size: 0.85rem; color: #666; margin-bottom: 8px;">Fibonacci Sequence</div>
+                <div id="fibonacciSeq" style="font-size: 1.1rem; font-weight: bold; color: #667eea; word-break: break-word; padding: 10px; background: #f5f7fa; border-radius: 4px;">0</div>
+            </div>
+        </div>
+    `;
+    toolContent.innerHTML = html;
+}
+
+function generateFibonacci() {
+    const terms = parseInt(document.getElementById('fibonacciTerms').value);
+    if (isNaN(terms) || terms < 1) {
+        showToast('Please enter at least 1 term', 'error');
+        return;
+    }
+    if (terms > 30) {
+        showToast('Maximum is 30 terms', 'error');
+        return;
+    }
+    
+    const sequence = [];
+    let a = 0, b = 1;
+    for (let i = 0; i < terms; i++) {
+        sequence.push(a);
+        [a, b] = [b, a + b];
+    }
+    
+    document.getElementById('fibonacciResult').style.display = 'block';
+    document.getElementById('fibonacciSeq').textContent = sequence.join(', ');
+    showToast('✓ Sequence generated!', 'success');
+}
+
+// ========== WORD COUNTER ==========
+function loadWordCounter() {
+    let html = `
+        <div class="tool-form">
+            <h3>🔤 Word Counter</h3>
+            <div class="form-group">
+                <label>Enter Text</label>
+                <textarea id="counterText" placeholder="Paste your text here..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; resize: vertical; min-height: 150px;"></textarea>
+            </div>
+            <button onclick="countWords()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold; margin-bottom: 15px;">Count Words</button>
+            <div id="counterResult" style="display: none; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div style="padding: 15px; background: #f5f7fa; border-radius: 6px;">
+                        <div style="font-size: 0.85rem; color: #666;">Words</div>
+                        <div id="wordCount" style="font-size: 1.5rem; font-weight: bold; color: #667eea; margin-top: 5px;">0</div>
+                    </div>
+                    <div style="padding: 15px; background: #f5f7fa; border-radius: 6px;">
+                        <div style="font-size: 0.85rem; color: #666;">Characters</div>
+                        <div id="charCount" style="font-size: 1.5rem; font-weight: bold; color: #28a745; margin-top: 5px;">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    toolContent.innerHTML = html;
+    document.getElementById('counterText').addEventListener('input', countWords);
+}
+
+function countWords() {
+    const text = document.getElementById('counterText').value;
+    const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+    const characters = text.length;
+    
+    if (text.trim().length > 0) {
+        document.getElementById('counterResult').style.display = 'block';
+        document.getElementById('wordCount').textContent = words;
+        document.getElementById('charCount').textContent = characters;
+    }
+}
+
+// ========== TEXT REVERSER ==========
+function loadTextReverser() {
+    let html = `
+        <div class="tool-form">
+            <h3>🔁 Text Reverser</h3>
+            <div class="form-group">
+                <label>Enter Text</label>
+                <input type="text" id="reverseInput" placeholder="e.g., hello" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;">
+            </div>
+            <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 15px;">
+                <div style="font-size: 0.85rem; color: #666; margin-bottom: 8px;">Reversed Text</div>
+                <div id="reverseOutput" style="font-size: 1.3rem; font-weight: bold; color: #667eea; padding: 10px; background: #f5f7fa; border-radius: 4px; min-height: 40px; display: flex; align-items: center;">-</div>
+                <button onclick="copyReverseText()" style="width: 100%; margin-top: 10px; padding: 10px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer;">📋 Copy Reversed</button>
+            </div>
+        </div>
+    `;
+    toolContent.innerHTML = html;
+    document.getElementById('reverseInput').addEventListener('input', reverseText);
+}
+
+function reverseText() {
+    const input = document.getElementById('reverseInput').value;
+    const reversed = input.split('').reverse().join('');
+    document.getElementById('reverseOutput').textContent = reversed || '-';
+}
+
+function copyReverseText() {
+    const text = document.getElementById('reverseOutput').textContent;
+    if (text !== '-') {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('✓ Copied!', 'success');
+        });
+    }
+}
+
+// ========== CASE CONVERTER ==========
+function loadCaseConverter() {
+    let html = `
+        <div class="tool-form">
+            <h3>🔠 Case Converter</h3>
+            <div class="form-group">
+                <label>Enter Text</label>
+                <textarea id="caseInput" placeholder="Enter text..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; resize: vertical; min-height: 100px;"></textarea>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px;">
+                <button onclick="convertCase('upper')" style="padding: 10px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">UPPER</button>
+                <button onclick="convertCase('lower')" style="padding: 10px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">lower</button>
+                <button onclick="convertCase('capitalize')" style="padding: 10px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Capitalize</button>
+            </div>
+            <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <div style="font-size: 0.85rem; color: #666; margin-bottom: 8px;">Result</div>
+                <textarea id="caseOutput" readonly style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; resize: vertical; min-height: 100px; background: #f5f7fa;"></textarea>
+                <button onclick="copyCaseText()" style="width: 100%; margin-top: 10px; padding: 10px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer;">📋 Copy Result</button>
+            </div>
+        </div>
+    `;
+    toolContent.innerHTML = html;
+}
+
+function convertCase(type) {
+    const input = document.getElementById('caseInput').value;
+    let output = '';
+    
+    if (type === 'upper') output = input.toUpperCase();
+    else if (type === 'lower') output = input.toLowerCase();
+    else if (type === 'capitalize') {
+        output = input.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+    }
+    
+    document.getElementById('caseOutput').value = output;
+    showToast('✓ Converted!', 'success');
+}
+
+function copyCaseText() {
+    const text = document.getElementById('caseOutput').value;
+    if (text) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('✓ Copied!', 'success');
+        });
+    }
+}
+
+// ========== REMOVE DUPLICATE WORDS ==========
+function loadRemoveDuplicates() {
+    let html = `
+        <div class="tool-form">
+            <h3>🧹 Remove Duplicate Words</h3>
+            <div class="form-group">
+                <label>Enter Text</label>
+                <textarea id="duplicateInput" placeholder="Enter text with duplicates..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; resize: vertical; min-height: 120px;"></textarea>
+            </div>
+            <button onclick="removeDuplicates()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold; margin-bottom: 15px;">Remove Duplicates</button>
+            <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <div style="font-size: 0.85rem; color: #666; margin-bottom: 8px;">Cleaned Text</div>
+                <textarea id="duplicateOutput" readonly style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; resize: vertical; min-height: 120px; background: #f5f7fa;"></textarea>
+                <button onclick="copyDuplicateText()" style="width: 100%; margin-top: 10px; padding: 10px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer;">📋 Copy Result</button>
+            </div>
+        </div>
+    `;
+    toolContent.innerHTML = html;
+}
+
+function removeDuplicates() {
+    const input = document.getElementById('duplicateInput').value;
+    const words = input.split(/\s+/).filter(w => w);
+    const unique = [...new Set(words)];
+    const output = unique.join(' ');
+    
+    document.getElementById('duplicateOutput').value = output;
+    showToast('✓ Duplicates removed!', 'success');
+}
+
+function copyDuplicateText() {
+    const text = document.getElementById('duplicateOutput').value;
+    if (text) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('✓ Copied!', 'success');
+        });
     }
 }
 
