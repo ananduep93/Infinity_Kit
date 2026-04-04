@@ -1259,3 +1259,268 @@ button:active {
         font-size: 1.4rem;
     }
 }
+
+/* Settings Button */
+.settings-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.settings-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.05);
+}
+
+.header {
+    position: relative;
+}
+
+/* Settings Modal */
+.settings-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+    overflow-y: auto;
+}
+
+.settings-modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.settings-panel {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.settings-header h2 {
+    margin: 0;
+    color: #333;
+    font-size: 1.5rem;
+}
+
+.settings-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.3s ease;
+}
+
+.settings-close:hover {
+    color: #333;
+}
+
+.settings-content {
+    padding: 20px;
+}
+
+.settings-section {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.settings-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.settings-section h3 {
+    margin: 0 0 12px 0;
+    color: #667eea;
+    font-size: 1.1rem;
+}
+
+.settings-option {
+    margin-bottom: 12px;
+}
+
+.settings-option label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.settings-option input[type="radio"],
+.settings-option input[type="checkbox"] {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+#favoritesList {
+    font-size: 0.9rem;
+    max-height: 180px;
+}
+
+.favorite-item {
+    padding: 6px 8px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin: 4px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.favorite-item button {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 3px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+/* Dark Mode */
+body.dark-mode {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    color: #e0e0e0;
+}
+
+body.dark-mode .header {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .search-bar {
+    background: #333;
+    color: #e0e0e0;
+    border-color: #555;
+}
+
+body.dark-mode .search-bar::placeholder {
+    color: #999;
+}
+
+body.dark-mode .search-results {
+    background: #2d2d2d;
+    border-color: #555;
+}
+
+body.dark-mode .folder-card,
+body.dark-mode .tool-square,
+body.dark-mode .tool-form {
+    background: #2d2d2d;
+    border-color: #555;
+    color: #e0e0e0;
+}
+
+body.dark-mode .modal-content {
+    background: #2d2d2d;
+    color: #e0e0e0;
+}
+
+body.dark-mode .settings-panel {
+    background: #2d2d2d;
+    color: #e0e0e0;
+}
+
+body.dark-mode .settings-header {
+    border-color: #555;
+}
+
+body.dark-mode .settings-section {
+    border-color: #555;
+}
+
+body.dark-mode input[type="text"],
+body.dark-mode input[type="number"],
+body.dark-mode input[type="date"],
+body.dark-mode input[type="password"],
+body.dark-mode textarea,
+body.dark-mode select {
+    background: #3d3d3d;
+    color: #e0e0e0;
+    border-color: #555;
+}
+
+/* Font Size Classes */
+body.font-small {
+    font-size: 13px;
+}
+
+body.font-medium {
+    font-size: 16px;
+}
+
+body.font-large {
+    font-size: 19px;
+}
+
+/* Card Size Classes */
+body.card-compact .folder-card,
+body.card-compact .tool-square {
+    padding: 12px;
+}
+
+body.card-normal .folder-card,
+body.card-normal .tool-square {
+    padding: 20px;
+}
+
+/* Animation Control */
+body.no-animations * {
+    animation: none !important;
+    transition: none !important;
+}

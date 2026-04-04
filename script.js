@@ -354,6 +354,8 @@ let recentSearchesList = JSON.parse(localStorage.getItem('recentSearches')) || [
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    loadSettings();
+    applySettings();
     renderFolders();
     setupEventListeners();
 });
@@ -734,6 +736,9 @@ function openTool(toolId, toolName, toolIcon) {
             break;
     }
 
+    // Track recent tool usage
+    addRecentTool(toolId, toolName);
+    
     modal.style.display = 'block';
 }
 
@@ -3166,6 +3171,234 @@ function copyDuplicateText() {
         navigator.clipboard.writeText(text).then(() => {
             showToast('✓ Copied!', 'success');
         });
+    }
+}
+
+// ========== SETTINGS SYSTEM ==========
+let appSettings = {
+    theme: 'light',
+    fontSize: 'medium',
+    cardSize: 'normal',
+    animationsEnabled: true,
+    favorites: [],
+    recentTools: [],
+    usageStats: {}
+};
+
+function loadSettings() {
+    const saved = localStorage.getItem('infinityKitSettings');
+    if (saved) {
+        try {
+            appSettings = JSON.parse(saved);
+        } catch (e) {
+            console.log('Error loading settings, using defaults');
+        }
+    }
+    updateSettingsUI();
+}
+
+function saveSettings() {
+    localStorage.setItem('infinityKitSettings', JSON.stringify(appSettings));
+}
+
+function applySettings() {
+    // Apply theme
+    document.body.classList.remove('dark-mode');
+    if (appSettings.theme === 'dark') {
+        document.body.classList.add('dark-mode');
+    }
+    
+    // Apply font size
+    document.body.classList.remove('font-small', 'font-medium', 'font-large');
+    document.body.classList.add('font-' + appSettings.fontSize);
+    
+    // Apply card size
+    document.body.classList.remove('card-compact', 'card-normal');
+    document.body.classList.add('card-' + appSettings.cardSize);
+    
+    // Apply animation preference
+    document.body.classList.remove('no-animations');
+    if (!appSettings.animationsEnabled) {
+        document.body.classList.add('no-animations');
+    }
+}
+
+function updateSettingsUI() {
+    // Update theme radio buttons
+    document.querySelector(`input[name="theme"][value="${appSettings.theme}"]`).checked = true;
+    
+    // Update font size radio buttons
+    document.querySelector(`input[name="fontSize"][value="${appSettings.fontSize}"]`).checked = true;
+    
+    // Update card size radio buttons
+    document.querySelector(`input[name="cardSize"][value="${appSettings.cardSize}"]`).checked = true;
+    
+    // Update animations toggle
+    document.getElementById('animToggle').checked = appSettings.animationsEnabled;
+    
+    // Update favorites list
+    updateFavoritesList();
+}
+
+function openSettings() {
+    const settingsModal = document.getElementById('settingsModal');
+    settingsModal.classList.add('show');
+}
+
+function closeSettings() {
+    const settingsModal = document.getElementById('settingsModal');
+    settingsModal.classList.remove('show');
+}
+
+// Close settings when clicking outside
+const settingsModal = document.getElementById('settingsModal');
+if (settingsModal) {
+    settingsModal.addEventListener('click', (e) => {
+        if (e.target === settingsModal) {
+            closeSettings();
+        }
+    });
+}
+
+function setTheme(theme) {
+    appSettings.theme = theme;
+    saveSettings();
+    applySettings();
+    showToast(`✓ Theme changed to ${theme} mode`, 'success');
+}
+
+function setFontSize(size) {
+    appSettings.fontSize = size;
+    saveSettings();
+    applySettings();
+    showToast(`✓ Font size set to ${size}`, 'success');
+}
+
+function setCardSize(size) {
+    appSettings.cardSize = size;
+    saveSettings();
+    applySettings();
+    showToast(`✓ Card size changed to ${size}`, 'success');
+}
+
+function toggleAnimations() {
+    appSettings.animationsEnabled = document.getElementById('animToggle').checked;
+    saveSettings();
+    applySettings();
+    showToast(`✓ Animations ${appSettings.animationsEnabled ? 'enabled' : 'disabled'}`, 'success');
+}
+
+function updateFavoritesList() {
+    const favoritesList = document.getElementById('favoritesList');
+    
+    if (appSettings.favorites.length === 0) {
+        favoritesList.innerHTML = '<p style="color: #999; font-size: 0.9rem;">No favorites yet</p>';
+        return;
+    }
+    
+    const html = appSettings.favorites.map(toolId => {
+        const tool = tools.find(t => t.id === toolId);
+        const name = tool ? tool.name : toolId;
+        return `
+            <div class="favorite-item">
+                <span>${name}</span>
+                <button onclick="removeFavorite('${toolId}')">Remove</button>
+            </div>
+        `;
+    }).join('');
+    
+    favoritesList.innerHTML = html;
+}
+
+function addFavorite(toolId) {
+    if (!appSettings.favorites.includes(toolId)) {
+        appSettings.favorites.push(toolId);
+        saveSettings();
+        showToast('✓ Added to favorites', 'success');
+    }
+}
+
+function removeFavorite(toolId) {
+    appSettings.favorites = appSettings.favorites.filter(id => id !== toolId);
+    saveSettings();
+    updateFavoritesList();
+    showToast('✓ Removed from favorites', 'success');
+}
+
+function clearAllFavorites() {
+    if (appSettings.favorites.length === 0) {
+        showToast('No favorites to clear', 'info');
+        return;
+    }
+    if (confirm('Are you sure you want to clear all favorites?')) {
+        appSettings.favorites = [];
+        saveSettings();
+        updateFavoritesList();
+        showToast('✓ All favorites cleared', 'success');
+    }
+}
+
+function addRecentTool(toolId, toolName) {
+    // Remove if already exists
+    appSettings.recentTools = appSettings.recentTools.filter(t => t.id !== toolId);
+    
+    // Add to beginning
+    appSettings.recentTools.unshift({ id: toolId, name: toolName, timestamp: Date.now() });
+    
+    // Keep only last 10
+    appSettings.recentTools = appSettings.recentTools.slice(0, 10);
+    
+    // Update usage stats
+    if (!appSettings.usageStats[toolId]) {
+        appSettings.usageStats[toolId] = 0;
+    }
+    appSettings.usageStats[toolId]++;
+    
+    saveSettings();
+}
+
+function clearRecentTools() {
+    if (appSettings.recentTools.length === 0) {
+        showToast('No recent tools to clear', 'info');
+        return;
+    }
+    if (confirm('Are you sure you want to clear recent tools history?')) {
+        appSettings.recentTools = [];
+        saveSettings();
+        showToast('✓ Recent tools cleared', 'success');
+    }
+}
+
+function clearUsageStats() {
+    if (Object.keys(appSettings.usageStats).length === 0) {
+        showToast('No usage stats to clear', 'info');
+        return;
+    }
+    if (confirm('Are you sure you want to reset usage statistics?')) {
+        appSettings.usageStats = {};
+        saveSettings();
+        showToast('✓ Usage stats reset', 'success');
+    }
+}
+
+function resetAllSettings() {
+    if (confirm('⚠️ This will reset ALL settings, preferences, and data. Are you sure?')) {
+        if (confirm('Really reset everything? This cannot be undone.')) {
+            appSettings = {
+                theme: 'light',
+                fontSize: 'medium',
+                cardSize: 'normal',
+                animationsEnabled: true,
+                favorites: [],
+                recentTools: [],
+                usageStats: {}
+            };
+            localStorage.removeItem('infinityKitSettings');
+            saveSettings();
+            loadSettings();
+            applySettings();
+            showToast('✓ All settings reset to default', 'success');
+        }
     }
 }
 
