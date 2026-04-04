@@ -23,13 +23,6 @@ const baseFolders = [
         tools: ['unitconverter', 'passwordgen', 'passwordsaver', 'passwordstrength', 'randomnamepicker']
     },
     {
-        id: 'decision-fun',
-        name: 'Decision & Fun',
-        icon: '🎲',
-        emoji: '🎲',
-        tools: ['decisionmaker', 'dice', 'bottlespin']
-    },
-    {
         id: 'productivity',
         name: 'Productivity',
         icon: '📚',
@@ -204,18 +197,6 @@ const tools = [
         description: 'Store passwords'
     },
     {
-        id: 'decisionmaker',
-        name: 'Decision Maker',
-        icon: '🎲',
-        description: 'Make random decisions'
-    },
-    {
-        id: 'bottlespin',
-        name: 'Bottle Spin',
-        icon: '🌀',
-        description: 'Spin the bottle'
-    },
-    {
         id: 'notes',
         name: 'Quick Notes',
         icon: '📝',
@@ -226,12 +207,6 @@ const tools = [
         name: 'Timer & Stopwatch',
         icon: '⏱️',
         description: 'Track time'
-    },
-    {
-        id: 'dice',
-        name: 'Dice Roller',
-        icon: '🎯',
-        description: 'Roll dice'
     },
     {
         id: 'focustimer',
@@ -823,20 +798,11 @@ function openTool(toolId, toolName, toolIcon) {
         case 'passwordsaver':
             loadPasswordSaver();
             break;
-        case 'decisionmaker':
-            loadDecisionMaker();
-            break;
-        case 'bottlespin':
-            loadBottleSpin();
-            break;
         case 'notes':
             loadQuickNotes();
             break;
         case 'timer':
             loadTimer();
-            break;
-        case 'dice':
-            loadDiceRoller();
             break;
         case 'imagetopdf':
             loadImageToPDF();
@@ -1641,74 +1607,6 @@ function deletePasswordItem(index) {
 }
 
 // ==================== DECISION MAKER ====================
-function loadDecisionMaker() {
-    const decisions = ['YES', 'NO', 'MAYBE', 'ASK LATER', 'DEFINITELY', 'NOT NOW', 'GO FOR IT!', 'HOLD ON', 'ABSOLUTELY', 'NOPE'];
-
-    let html = `
-        <div class="decision-maker">
-            <p>Ask a yes/no question and get a decision...</p>
-            <button class="decision-button" onclick="makeDecision()">🎲 Make Decision 🎲</button>
-            <div class="decision-display" id="decisionDisplay">Ask your question...</div>
-        </div>
-    `;
-    toolContent.innerHTML = html;
-
-    window.decisions = decisions;
-}
-
-function makeDecision() {
-    const decisions = window.decisions;
-    const randomIndex = Math.floor(Math.random() * decisions.length);
-    const decision = decisions[randomIndex];
-
-    const display = document.getElementById('decisionDisplay');
-    display.style.animation = 'none';
-    setTimeout(() => {
-        display.textContent = decision;
-        display.style.animation = 'fadeIn 0.5s ease';
-    }, 10);
-}
-
-// ==================== BOTTLE SPIN ====================
-function loadBottleSpin() {
-    const people = ['You', 'Friend 1', 'Friend 2', 'Friend 3', 'Friend 4'];
-
-    let html = `
-        <div class="bottle-spinner">
-            <p>Spin the bottle to pick someone!</p>
-            <button onclick="spinBottle()" class="decision-button">SPIN! 🌀</button>
-            <div class="bottle-container">
-                <div class="bottle" id="bottle">🍾</div>
-            </div>
-            <div class="spin-result" id="spinResult">Click SPIN to start</div>
-        </div>
-    `;
-    toolContent.innerHTML = html;
-
-    window.bottlePeople = people;
-}
-
-function spinBottle() {
-    const bottle = document.getElementById('bottle');
-    const result = document.getElementById('spinResult');
-
-    // Disable button during spin
-    event.target.disabled = true;
-
-    bottle.style.animation = 'none';
-    setTimeout(() => {
-        bottle.style.animation = 'spin 2s linear';
-
-        setTimeout(() => {
-            const randomPerson = window.bottlePeople[
-                Math.floor(Math.random() * window.bottlePeople.length)
-            ];
-            result.textContent = `🎯 ${randomPerson}!`;
-            event.target.disabled = false;
-        }, 2000);
-    }, 10);
-}
-
 // ==================== QUICK NOTES ====================
 function loadQuickNotes() {
     const notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
@@ -1888,65 +1786,6 @@ function updateStopwatchDisplay() {
 
 function pad(num) {
     return num.toString().padStart(2, '0');
-}
-
-// ==================== DICE ROLLER ====================
-function loadDiceRoller() {
-    let html = `
-        <div class="tool-form">
-            <div class="form-group">
-                <label>Number of Dice:</label>
-                <input type="number" id="diceCount" min="1" max="10" value="1">
-            </div>
-            <div class="form-group">
-                <label>Dice Type:</label>
-                <select id="diceType">
-                    <option value="6">D6 (6-sided)</option>
-                    <option value="4">D4 (4-sided)</option>
-                    <option value="8">D8 (8-sided)</option>
-                    <option value="10">D10 (10-sided)</option>
-                    <option value="12">D12 (12-sided)</option>
-                    <option value="20">D20 (20-sided)</option>
-                    <option value="100">D100 (100-sided)</option>
-                </select>
-            </div>
-            <button onclick="rollDice()">🎲 Roll Dice</button>
-            
-            <div id="diceResults" style="background: #f0f0f0; padding: 20px; border-radius: 8px; margin-top: 20px; display: none;">
-                <div id="diceRolls" style="margin-bottom: 15px; text-align: center;"></div>
-                <div style="font-size: 2rem; font-weight: bold; text-align: center; color: #667eea;">
-                    Total: <span id="diceTotal">0</span>
-                </div>
-            </div>
-        </div>
-    `;
-    toolContent.innerHTML = html;
-}
-
-function rollDice() {
-    const count = parseInt(document.getElementById('diceCount').value);
-    const sides = parseInt(document.getElementById('diceType').value);
-
-    if (count <= 0) {
-        showToast('Invalid dice count', 'error');
-        return;
-    }
-
-    let rolls = [];
-    let total = 0;
-
-    for (let i = 0; i < count; i++) {
-        const roll = Math.floor(Math.random() * sides) + 1;
-        rolls.push(roll);
-        total += roll;
-    }
-
-    document.getElementById('diceRolls').textContent = 
-        `Rolling ${count}x D${sides}: ${rolls.join(', ')}`;
-    document.getElementById('diceTotal').textContent = total;
-    document.getElementById('diceResults').style.display = 'block';
-
-    showToast(`Rolled ${count}x D${sides} = ${total}`, 'success');
 }
 
 // ==================== PDF TOOLS ====================
