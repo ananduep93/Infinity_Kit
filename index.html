@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INFINITY KIT⚡ - Daily Life Tools</title>
+    <title>INFINITY KIT&#9889; - Daily Life Tools</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
     <!-- Header -->
     <header class="header">
-        <h1 class="title">⚡ INFINITY KIT ⚡</h1>
+        <h1 class="title">&#9889; INFINITY KIT &#9889;</h1>
         <p class="subtitle">Your Daily Life Toolkit</p>
-        <button class="settings-btn" id="settingsBtn" onclick="openSettings()">⚙️ Settings</button>
+        <button class="settings-btn" id="settingsBtn" onclick="openSettings()">&#9881;&#65039; Settings</button>
     </header>
 
     <!-- Search Bar -->
@@ -32,7 +35,7 @@
 
     <!-- Back Button (Hidden by default) -->
     <div class="back-button-container" id="backButtonContainer" style="display: none;">
-        <button class="back-button" id="backButton">← Back to Folders</button>
+        <button class="back-button" id="backButton">&larr; Back to Folders</button>
         <h2 id="currentFolderTitle" class="current-folder-title"></h2>
     </div>
 
@@ -64,27 +67,27 @@
     <div id="settingsModal" class="settings-modal">
         <div class="settings-panel">
             <div class="settings-header">
-                <h2>⚙️ Settings </h2>
-                <button class="settings-close" onclick="closeSettings()">✕</button>
+                <h2>&#9881;&#65039; Settings </h2>
+                <button class="settings-close" onclick="closeSettings()">&#10005;</button>
             </div>
             
             <div class="settings-content">
                 <!-- Theme Settings -->
                 <div class="settings-section">
-                    <h3>🌗 Theme</h3>
+                    <h3>&#127767; Theme</h3>
                     <div class="settings-option">
                         <label>
-                            <input type="radio" name="theme" value="light" onchange="setTheme('light')"> ☀️ Light Mode
+                            <input type="radio" name="theme" value="light" onchange="setTheme('light')"> &#9728;&#65039; Light Mode
                         </label>
                         <label>
-                            <input type="radio" name="theme" value="dark" onchange="setTheme('dark')"> 🌙 Dark Mode
+                            <input type="radio" name="theme" value="dark" onchange="setTheme('dark')"> &#127769; Dark Mode
                         </label>
                     </div>
                 </div>
 
                 <!-- Font Size Control -->
                 <div class="settings-section">
-                    <h3>🔤 Font Size</h3>
+                    <h3>&#128292; Font Size</h3>
                     <div class="settings-option">
                         <label>
                             <input type="radio" name="fontSize" value="small" onchange="setFontSize('small')"> Small
@@ -100,7 +103,7 @@
 
                 <!-- UI Preferences -->
                 <div class="settings-section">
-                    <h3>🎨 UI Preferences</h3>
+                    <h3>&#127912; UI Preferences</h3>
                     <div class="settings-option">
                         <label>Card Size:</label>
                         <div style="margin: 8px 0;">
@@ -116,6 +119,15 @@
                         <label>
                             <input type="checkbox" id="animToggle" onchange="toggleAnimations()"> Enable Animations
                         </label>
+                    </div>
+                </div>
+
+                <!-- App Install -->
+                <div class="settings-section">
+                    <h3>&#128241; App</h3>
+                    <div class="settings-option">
+                        <button id="installAppBtn" type="button" class="install-app-btn">&#128242; Install App</button>
+                        <p class="install-app-hint">Install Infinity Kit for faster access and offline support.</p>
                     </div>
                 </div>
 

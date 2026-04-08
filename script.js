@@ -549,11 +549,14 @@ const searchResults = document.getElementById('searchResults');
 const searchResultsList = document.getElementById('searchResultsList');
 const noResults = document.getElementById('noResults');
 const recentSearches = document.getElementById('recentSearches');
+const installAppBtn = document.getElementById('installAppBtn');
 
 // App State
 let calcDisplay = '';
 let currentFolder = null;
 let recentSearchesList = JSON.parse(localStorage.getItem('recentSearches')) || [];
+let deferredInstallPrompt = null;
+let isPwaInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -562,7 +565,107 @@ document.addEventListener('DOMContentLoaded', () => {
     updateFolders();
     renderFolders();
     setupEventListeners();
+    setupPwaInstall();
+    registerServiceWorker();
 });
+
+function setupPwaInstall() {
+    updateInstallButtonState();
+    if (installAppBtn) {
+        installAppBtn.addEventListener('click', handleInstallApp);
+    }
+
+    window.addEventListener('beforeinstallprompt', (event) => {
+        event.preventDefault();
+        deferredInstallPrompt = event;
+        updateInstallButtonState();
+    });
+
+    window.addEventListener('appinstalled', () => {
+        isPwaInstalled = true;
+        deferredInstallPrompt = null;
+        updateInstallButtonState();
+        showToast('Infinity Kit installed successfully', 'success');
+    });
+
+    if (window.matchMedia) {
+        const standaloneMedia = window.matchMedia('(display-mode: standalone)');
+        const onStandaloneChange = (event) => {
+            isPwaInstalled = event.matches;
+            updateInstallButtonState();
+        };
+
+        if (typeof standaloneMedia.addEventListener === 'function') {
+            standaloneMedia.addEventListener('change', onStandaloneChange);
+        } else if (typeof standaloneMedia.addListener === 'function') {
+            standaloneMedia.addListener(onStandaloneChange);
+        }
+    }
+}
+
+function updateInstallButtonState() {
+    if (!installAppBtn) {
+        return;
+    }
+
+    installAppBtn.classList.remove('is-installed');
+    installAppBtn.disabled = false;
+    installAppBtn.textContent = '\uD83D\uDCF2 Install App';
+    installAppBtn.title = '';
+
+    if (isPwaInstalled) {
+        installAppBtn.disabled = true;
+        installAppBtn.classList.add('is-installed');
+        installAppBtn.textContent = 'Installed \u2705';
+        return;
+    }
+
+    if (!deferredInstallPrompt) {
+        installAppBtn.disabled = true;
+        installAppBtn.title = 'Install will be available once your browser allows it.';
+    }
+}
+
+async function handleInstallApp() {
+    if (isPwaInstalled) {
+        showToast('Infinity Kit is already installed', 'info');
+        return;
+    }
+
+    if (!deferredInstallPrompt) {
+        showToast('Install prompt is not available yet on this browser', 'info');
+        return;
+    }
+
+    try {
+        deferredInstallPrompt.prompt();
+        const { outcome } = await deferredInstallPrompt.userChoice;
+
+        if (outcome === 'accepted') {
+            showToast('Install started', 'success');
+        } else {
+            showToast('Install canceled', 'info');
+        }
+    } catch (error) {
+        showToast('Unable to open install prompt', 'error');
+    } finally {
+        deferredInstallPrompt = null;
+    }
+
+    updateInstallButtonState();
+}
+
+function registerServiceWorker() {
+    if (!('serviceWorker' in navigator)) {
+        return;
+    }
+
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js').catch((error) => {
+            console.error('Service worker registration failed:', error);
+        });
+    });
+}
 
 // Render folder cards
 function renderFolders() {
@@ -3350,6 +3453,7 @@ function updateSettingsUI() {
 function openSettings() {
     const settingsModal = document.getElementById('settingsModal');
     settingsModal.classList.add('show');
+    updateInstallButtonState();
 }
 
 function closeSettings() {
