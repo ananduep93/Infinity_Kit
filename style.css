@@ -246,6 +246,24 @@ body {
     align-items: center;
     position: relative;
     overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.folder-card.long-pressing {
+    transform: scale(0.98);
+}
+
+.folder-card.favorite-folder {
+    border: 2px solid #ffc107;
+}
+
+.folder-favorite-badge {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-size: 1.1rem;
+    z-index: 2;
 }
 
 .folder-card::before {
