@@ -2016,9 +2016,9 @@ body.no-animations * {
         top: 100% !important;
         right: 15px !important;
         left: auto !important;
-        background: var(--glass-bg) !important;
-        backdrop-filter: blur(15px) !important;
-        -webkit-backdrop-filter: blur(15px) !important;
+        background: var(--bg-gradient) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
         border: 1px solid var(--glass-border) !important;
         border-radius: 12px !important;
         padding: 15px 25px !important;
