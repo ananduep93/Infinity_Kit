@@ -248,6 +248,127 @@ body {
     padding: 12px;
 }
 
+/* About Page & Creators Styling */
+.about-container {
+    text-align: center;
+    max-width: 900px !important;
+}
+
+.about-title {
+    margin-bottom: 30px;
+}
+
+.about-section {
+    margin-bottom: 50px;
+    text-align: left;
+}
+
+.about-container h3 {
+    font-size: 1.8rem;
+    color: #667eea;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.about-section p {
+    margin-bottom: 20px;
+    opacity: 0.9;
+}
+
+.creators-intro {
+    font-style: italic;
+    margin-bottom: 30px !important;
+}
+
+.creator-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 25px;
+}
+
+.creator-card {
+    background: rgba(102, 126, 234, 0.08);
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    border-radius: 12px;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    text-decoration: none !important;
+    color: var(--text-color) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.creator-card:hover {
+    transform: translateY(-4px);
+    background: var(--primary-gradient);
+    border-color: transparent;
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    color: white !important;
+}
+
+.creator-card:hover .creator-icon,
+.creator-card:hover .creator-info strong,
+.creator-card:hover .creator-info span {
+    color: white !important;
+    -webkit-text-fill-color: white !important;
+    opacity: 1;
+}
+
+.creator-icon {
+    font-size: 2rem;
+    color: #667eea;
+}
+
+.creator-info {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.creator-info strong {
+    font-size: 1.1rem;
+    margin-bottom: 2px;
+    font-weight: 700;
+}
+
+.creator-info span {
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+.footer-tagline {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-top: 10px;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 600;
+}
+
+@media (max-width: 600px) {
+    .about-section {
+        text-align: center;
+    }
+    .about-container h3 {
+        justify-content: center;
+    }
+    .creator-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    .creator-info {
+        text-align: center;
+    }
+}
+
 /* Contact Methods */
 .contact-methods {
     display: flex;
