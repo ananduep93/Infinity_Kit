@@ -571,10 +571,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function handleInitialNavigation() {
     const hash = window.location.hash.substring(1);
-    if (hash) {
-        const folder = folders.find(f => f.id === hash);
+    if (!hash) return;
+
+    const folder = folders.find(f => f.id === hash);
+    const tool = tools.find(t => t.id === hash);
+
+    if (folder || tool) {
+        // Inject home state into history so "back" returns to main grid instead of closing app
+        history.replaceState({ type: 'home' }, '', window.location.pathname + window.location.search);
+        
         if (folder) {
-            openFolder(folder, true);
+            openFolder(folder); // This will pushState for the folder
+        } else if (tool) {
+            // Find parent folder for tool
+            const parent = folders.find(f => f.tools.includes(tool.id));
+            if (parent) {
+                // First open parent folder visually
+                currentFolder = parent;
+                foldersGrid.style.display = 'none';
+                backButtonContainer.style.display = 'flex';
+                currentFolderTitle.textContent = `${parent.emoji} ${parent.name}`;
+                renderToolsInFolder(parent);
+                toolsGrid.style.display = 'grid';
+                // pushState for folder
+                history.pushState({ type: 'folder', folderId: parent.id }, '', `#${parent.id}`);
+            }
+            // Then open tool which will push its own state
+            openTool(tool.id, tool.name, tool.icon);
         }
     }
 }
@@ -856,10 +879,17 @@ function setupEventListeners() {
 
     // Support for browser back/forward and mobile gestures
     window.addEventListener('popstate', (event) => {
-        if (event.state && event.state.type === 'folder') {
-            const folder = folders.find(f => f.id === event.state.folderId);
+        const state = event.state;
+        
+        if (state && state.type === 'tool') {
+            doOpenTool(state.toolId, state.toolName, state.toolIcon, true);
+        } else if (state && state.type === 'folder') {
+            closeTool(true);
+            const folder = folders.find(f => f.id === state.folderId);
             if (folder) openFolder(folder, true);
         } else {
+            // No state or home state
+            closeTool(true);
             if (currentFolder) {
                 backToFolders(true);
             }
@@ -930,20 +960,20 @@ function navigateTo(pageId) {
 }
 
 // Open tool
-function openTool(toolId, toolName, toolIcon) {
+function openTool(toolId, toolName, toolIcon, fromHistory = false) {
     const loadingOverlay = document.getElementById('toolLoadingOverlay');
     if(loadingOverlay) {
         loadingOverlay.style.display = 'flex';
         setTimeout(() => {
             loadingOverlay.style.display = 'none';
-            doOpenTool(toolId, toolName, toolIcon);
+            doOpenTool(toolId, toolName, toolIcon, fromHistory);
         }, 400); // 400ms soft loading animation effect
     } else {
-        doOpenTool(toolId, toolName, toolIcon);
+        doOpenTool(toolId, toolName, toolIcon, fromHistory);
     }
 }
 
-function doOpenTool(toolId, toolName, toolIcon) {
+function doOpenTool(toolId, toolName, toolIcon, fromHistory = false) {
     if (typeof cleanupExpenseToolSync === 'function') {
         cleanupExpenseToolSync();
     }
@@ -952,7 +982,8 @@ function doOpenTool(toolId, toolName, toolIcon) {
     
     // Track tool usage
     trackToolUsage(toolId);
-
+    
+    // Switch for loading specific tool logic...
     switch(toolId) {
         case 'calculator':
             loadCalculator();
@@ -1133,15 +1164,23 @@ function doOpenTool(toolId, toolName, toolIcon) {
     addRecentTool(toolId, toolName);
     
     modal.style.display = 'block';
+
+    if (!fromHistory) {
+        history.pushState({ type: 'tool', toolId, toolName, toolIcon, folderId: currentFolder?.id }, '', `#${toolId}`);
+    }
 }
 
 // Close tool
-function closeTool() {
+function closeTool(fromHistory = false) {
     if (typeof cleanupExpenseToolSync === 'function') {
         cleanupExpenseToolSync();
     }
     modal.style.display = 'none';
     calcDisplay = '';
+
+    if (!fromHistory && history.state && history.state.type === 'tool') {
+        history.back();
+    }
 }
 
 // Show toast notification
