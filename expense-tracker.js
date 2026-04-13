@@ -277,13 +277,13 @@ function loadExpenseListTool() {
     toolContent.innerHTML = `
         <div class="tool-form">
             <h3>📋 Expense List</h3>
-            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr auto; gap:10px; margin-bottom: 12px;">
-                <select id="expenseListCategoryFilter" onchange="renderExpenseListTable()">
+            <div class="input-group" style="flex-wrap: wrap; margin-bottom: 20px;">
+                <select id="expenseListCategoryFilter" onchange="renderExpenseListTable()" style="flex: 1; min-width: 140px;">
                     <option value="all">All Categories</option>
                     ${getExpenseCategoryOptions()}
                 </select>
-                <input type="date" id="expenseListFromDate" onchange="renderExpenseListTable()">
-                <input type="date" id="expenseListToDate" onchange="renderExpenseListTable()">
+                <input type="date" id="expenseListFromDate" onchange="renderExpenseListTable()" style="flex: 1; min-width: 120px;">
+                <input type="date" id="expenseListToDate" onchange="renderExpenseListTable()" style="flex: 1; min-width: 120px;">
                 <button onclick="resetExpenseListFilters()" class="btn-secondary">Reset</button>
             </div>
             <div id="expenseListTable"></div>
@@ -465,9 +465,9 @@ function loadBudgetTrackerTool() {
     toolContent.innerHTML = `
         <div class="tool-form">
             <h3>🎯 Budget Tracker</h3>
-            <div style="display:grid; grid-template-columns: 1fr 1fr auto; gap:10px; margin-bottom: 12px;">
-                <select id="budgetCategory">${getExpenseCategoryOptions()}</select>
-                <input type="number" id="budgetAmount" min="0.01" step="0.01" placeholder="Budget amount">
+            <div class="input-group" style="flex-wrap: wrap; margin-bottom: 20px;">
+                <select id="budgetCategory" style="flex: 1; min-width: 120px;">${getExpenseCategoryOptions()}</select>
+                <input type="number" id="budgetAmount" min="0.01" step="0.01" placeholder="Budget amount" style="flex: 1; min-width: 100px;">
                 <button onclick="saveCategoryBudget()">Save</button>
             </div>
             <div id="budgetTrackerList"></div>

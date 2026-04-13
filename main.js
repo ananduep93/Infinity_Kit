@@ -1651,14 +1651,14 @@ function loadUnitConverter() {
                     <option value="Temperature">Temperature</option>
                 </select>
             </div>
-            <div class="form-group" style="display: flex; gap: 10px;">
-                <input type="number" id="ucInput1" oninput="ucConvert('1')" style="flex: 2; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;" placeholder="Value">
-                <select id="ucUnit1" onchange="ucConvert('1')" style="flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;"></select>
+            <div class="converter-group">
+                <input type="number" id="ucInput1" oninput="ucConvert('1')" placeholder="Value">
+                <select id="ucUnit1" onchange="ucConvert('1')"></select>
             </div>
-            <div style="text-align: center; margin: 10px 0; font-size: 1.5rem; color: #667eea; font-weight: bold;">⇅</div>
-            <div class="form-group" style="display: flex; gap: 10px;">
-                <input type="number" id="ucInput2" oninput="ucConvert('2')" style="flex: 2; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;" placeholder="Value">
-                <select id="ucUnit2" onchange="ucConvert('2')" style="flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;"></select>
+            <div style="text-align: center; margin: 5px 0; font-size: 1.2rem; color: #667eea; font-weight: bold;">⇅</div>
+            <div class="converter-group">
+                <input type="number" id="ucInput2" oninput="ucConvert('2')" placeholder="Value">
+                <select id="ucUnit2" onchange="ucConvert('2')"></select>
             </div>
         </div>
     `;
@@ -1754,9 +1754,9 @@ function loadPasswordGenerator() {
             <button onclick="generatePassword()">Generate Password</button>
             <div class="generated-password" id="generatedPwd">Click Generate</div>
             
-            <div class="btn-group">
+            <div class="input-group">
                 <button onclick="copyPassword()">Copy</button>
-                <button onclick="savePwd()" class="btn-secondary">Save This Password</button>
+                <button onclick="savePwd()" class="btn-secondary">Save Password</button>
             </div>
         </div>
     `;
@@ -1998,7 +1998,7 @@ function loadTimer() {
                     <label>Seconds:</label>
                     <input type="number" id="timerSec" min="0" max="59" value="0">
                 </div>
-                <div style="display: flex; gap: 10px;">
+                <div class="input-group">
                     <button onclick="startTimer()">Start</button>
                     <button class="btn-secondary" onclick="stopTimer()">Stop</button>
                     <button class="btn-secondary" onclick="resetTimer()">Reset</button>
@@ -2010,7 +2010,7 @@ function loadTimer() {
             <div>
                 <h3>⏱️ Stopwatch Mode</h3>
                 <div id="stopwatchDisplay" style="font-size: 2.5rem; text-align: center; font-weight: bold; margin: 20px 0; font-family: monospace; color: #667eea;">00:00:00</div>
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <div class="input-group">
                     <button onclick="startStopwatch()">Start</button>
                     <button class="btn-secondary" onclick="stopStopwatch()">Stop</button>
                     <button class="btn-secondary" onclick="resetStopwatch()">Reset</button>
@@ -2018,10 +2018,10 @@ function loadTimer() {
                 
                 <div class="form-group">
                     <label>Alert at specific time:</label>
-                    <div style="display: flex; gap: 5px; align-items: center;">
-                        <input type="number" id="swAlertMin" placeholder="Min" style="width: 70px;">
-                        <span>:</span>
-                        <input type="number" id="swAlertSec" placeholder="Sec" style="width: 70px;">
+                    <div class="input-group">
+                        <input type="number" id="swAlertMin" placeholder="Min">
+                        <span style="align-self: center; font-weight: bold;">:</span>
+                        <input type="number" id="swAlertSec" placeholder="Sec">
                     </div>
                 </div>
             </div>

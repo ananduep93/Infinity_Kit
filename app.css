@@ -1029,23 +1029,49 @@ input:focus, textarea:focus, select:focus {
 
 button {
     padding: 12px 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--primary-gradient);
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
 }
 
 button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
 }
 
 button:active {
     transform: translateY(0);
+}
+
+/* Global Input Group Utility */
+.input-group {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+    margin-bottom: 20px;
+}
+
+.input-group input, 
+.input-group select {
+    flex: 1;
+    min-width: 0;
+    margin-bottom: 0;
+}
+
+.input-group button {
+    padding: 12px 24px;
+    white-space: nowrap;
+    border-radius: 10px;
 }
 
 .btn-group {
@@ -1213,7 +1239,8 @@ button:active {
 
 .todo-input-group {
     display: flex;
-    gap: 10px;
+    gap: 12px;
+    align-items: stretch;
 }
 
 .todo-input-group input {
@@ -1270,8 +1297,9 @@ button:active {
 /* Unit Converter Styling */
 .converter-group {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     margin: 10px 0;
+    align-items: stretch;
 }
 
 .converter-group input {
@@ -2633,7 +2661,78 @@ body.no-animations * {
     transform: scale(1.1);
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+/* Extra Mobile Responsiveness Fixes (<480px) */
+@media (max-width: 480px) {
+    .modal-content {
+        padding: 24px 20px;
+        margin: 5% 15px;
+        width: calc(100% - 30px);
+    }
+    
+    #toolTitle {
+        font-size: 1.6rem;
+        margin-bottom: 20px;
+    }
+    
+    .input-group, .todo-input-group, .converter-group {
+        gap: 8px;
+    }
+    
+    input, select, button, .health-input, .health-select {
+        padding: 10px 14px !important;
+        font-size: 0.95rem !important;
+        border-radius: 8px !important;
+    }
+    
+    .input-group button, .todo-input-group button {
+        padding: 10px 18px !important;
+    }
+    
+    .folder-card {
+        padding: 25px 15px;
+        min-height: 170px;
+    }
+    
+    .folder-icon {
+        font-size: 2.8rem;
+    }
+    
+    .folder-name {
+        font-size: 1.05rem;
+    }
+}
+
+/* Very Small Mobile (<380px) */
+@media (max-width: 380px) {
+    .modal-content {
+        padding: 20px 16px;
+    }
+    
+    .input-group, .todo-input-group, .converter-group {
+        gap: 6px;
+    }
+    
+    .input-group button, .todo-input-group button {
+        padding: 8px 14px !important;
+        font-size: 0.9rem !important;
+        min-width: 70px;
+    }
+    
+    #toolTitle {
+        font-size: 1.4rem;
+    }
+    
+    .folder-card {
+        padding: 20px 12px;
+        min-height: 150px;
+    }
+    
+    .folder-icon {
+        font-size: 2.4rem;
+        margin-bottom: 10px;
+    }
+    
+    .folder-name {
+        font-size: 1rem;
+    }
 }
