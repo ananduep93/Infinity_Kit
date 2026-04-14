@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Essentials Tools - Infinity Kit⚡</title>
+    <meta name="description" content="Must-have daily tools like calculators, notes, and task lists for maximum productivity. Free utilities from Infinity Kit.">
+    <link rel="canonical" href="https://infinitykit.online/folder/daily-essentials.html">
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8795968572402515" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="../app.css?v=16.3">
+    <link rel="shortcut icon" href="../icon-192.png" type="image/png">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "Daily Essentials",
+      "description": "Must-have daily tools like calculators, notes, and task lists for maximum productivity.",
+      "url": "https://infinitykit.online/folder/daily-essentials.html"
+    }
+    </script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-logo" onclick="location.href='../index.html'">⚡INFINITY KIT</div>
+        <button class="menu-btn" onclick="toggleMenu()">☰</button>
+        <div class="nav-right" id="navRight">
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../index.html#about-page">About</a>
+                <a href="../index.html#contact-page">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="breadcrumb">
+        <a href="../index.html">Home</a>
+        <span class="separator">&rsaquo;</span>
+        <span class="current">Daily Essentials</span>
+    </div>
+
+    <main class="tool-page-container category-layout">
+        <div class="tool-header">
+            <h1 class="tool-title">🏠 Daily Essentials</h1>
+            
+        </div>
+
+        <div class="tools-grid" id="toolsGrid">
+            <!-- Tools will be rendered here by main.js -->
+        </div>
+
+        
+    </main>
+
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="../index.html#about-page">About</a>
+            <a href="../index.html#privacy-page">Privacy Policy</a>
+            <a href="../index.html#terms-page">Terms & Conditions</a>
+            <a href="../index.html#contact-page">Contact</a>
+        </div>
+        <div class="footer-bottom">
+            <p id="copyrightText"></p>
+        </div>
+    </footer>
+
+    <script src="../notifications.js?v=5"></script>
+    <script src="../main.js?v=16.3"></script>
+    <script src="../expense-tracker.js?v=6"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const folderId = 'daily-essentials';
+            const folder = folders.find(f => f.id === folderId);
+            if (folder) {
+                renderToolsInFolder(folder);
+                
+            }
+        });
+    </script>
+</body>
+</html>

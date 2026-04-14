@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health & Wellness Tools - Infinity Kit⚡</title>
+    <meta name="description" content="BMI calculators, drug dosage guides, and medication reminders. Free health utilities from Infinity Kit.">
+    <link rel="canonical" href="https://infinitykit.online/folder/health-utility-hub.html">
+    <link rel="stylesheet" href="../app.css?v=16.3">
+    <link rel="shortcut icon" href="../icon-192.png" type="image/png">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "Health Utility Hub",
+      "description": "BMI calculators, drug dosage guides, and medication reminders.",
+      "url": "https://infinitykit.online/folder/health-utility-hub.html"
+    }
+    </script>
+</head>
+<body>
+    <nav class="navbar"><div class="nav-logo" onclick="location.href='../index.html'">⚡INFINITY KIT</div></nav>
+    <div class="breadcrumb"><a href="../index.html">Home</a><span class="separator">&rsaquo;</span><span class="current">Health Hub</span></div>
+    <main class="tool-page-container category-layout">
+        <div class="tool-header"><h1 class="tool-title">🩺 Health Utility Hub</h1></div>
+        <div class="tools-grid" id="toolsGrid"></div>
+    </main>
+    <script src="../main.js?v=16.3"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const folderId = 'health-utility-hub';
+            const folder = folders.find(f => f.id === folderId);
+            if (folder) {
+                renderToolsInFolder(folder);
+                
+            }
+        });
+    </script>
+</body>
+</html>

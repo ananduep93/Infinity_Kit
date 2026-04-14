@@ -666,42 +666,39 @@ body {
     font-style: italic;
 }
 
-/* Back Button */
-.back-button-container {
+/* Breadcrumbs */
+.breadcrumb {
     display: flex;
     align-items: center;
-    gap: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    animation: slideInDown 0.3s ease;
+    gap: 10px;
+    padding: 15px 20px;
+    background: var(--glass-bg);
+    border-bottom: 1px solid var(--glass-border);
+    font-size: 0.9rem;
+    color: var(--text-color);
+    margin-bottom: 20px;
 }
 
-.back-button {
-    background: #1e293b;
-    color: white;
-    border: 1px solid #334155;
-    padding: 12px 24px;
-    border-radius: 10px;
-    font-size: 1rem;
+.breadcrumb a {
+    color: #667eea;
+    text-decoration: none;
     font-weight: 600;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity 0.3s;
 }
 
-.back-button:hover {
-    background: #0f172a;
-    color: white;
-    transform: translateX(-5px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+.breadcrumb a:hover {
+    text-decoration: underline;
+    opacity: 0.8;
 }
 
-.current-folder-title {
-    color: white;
-    font-size: 1.8rem;
-    margin: 0;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+.breadcrumb .separator {
+    opacity: 0.4;
+    font-size: 0.8rem;
+}
+
+.breadcrumb .current {
+    opacity: 0.6;
+    font-weight: 500;
 }
 
 @keyframes slideInDown {
@@ -810,11 +807,17 @@ body {
 }
 
 /* Tools Container */
-.tools-container {
+.tools-container, .tool-page-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
 }
+
+/* Specific layout for single tool pages to keep them focused */
+.tool-page-container:not(.category-layout) {
+    max-width: 800px;
+}
+
 
 .tools-grid {
     display: grid;

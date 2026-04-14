@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Essential Digital Utilities - Infinity Kit⚡</title>
+    <meta name="description" content="High-utility tools including password generators, unit converters, and random pickers. Free online utilities from Infinity Kit.">
+    <link rel="canonical" href="https://infinitykit.online/folder/utilities.html">
+    <link rel="stylesheet" href="../app.css?v=16.3">
+    <link rel="shortcut icon" href="../icon-192.png" type="image/png">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "Utilities",
+      "description": "High-utility tools including password generators, unit converters, and random pickers.",
+      "url": "https://infinitykit.online/folder/utilities.html"
+    }
+    </script>
+</head>
+<body>
+    <nav class="navbar"><div class="nav-logo" onclick="location.href='../index.html'">⚡INFINITY KIT</div></nav>
+    <div class="breadcrumb"><a href="../index.html">Home</a><span class="separator">&rsaquo;</span><span class="current">Utilities</span></div>
+    <main class="tool-page-container category-layout">
+        <div class="tool-header"><h1 class="tool-title">🛠️ Utilities</h1></div>
+        <div class="tools-grid" id="toolsGrid"></div>
+    </main>
+    <script src="../main.js?v=16.3"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const folderId = 'utilities';
+            const folder = folders.find(f => f.id === folderId);
+            if (folder) {
+                renderToolsInFolder(folder);
+                
+            }
+        });
+    </script>
+</body>
+</html>

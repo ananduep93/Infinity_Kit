@@ -1,4 +1,5 @@
-console.log('Infinity Kit Version 16.2 Loaded - Notification System Active');
+console.log('Infinity Kit Version 16.4 Loaded - Centralized Path Resolver Active (Strict Fix)');
+// Tip: If links fail, try a hard refresh (Ctrl + Shift + R) to clear browser cache.
 
 // Folders with Tools Data
 const baseFolders = [
@@ -581,6 +582,40 @@ const footerPwaContainer = document.getElementById('footerPwaContainer');
 const footerInstallBtn = document.getElementById('footerInstallBtn');
 const copyrightText = document.getElementById('copyrightText');
 
+// Centralized Path Management System
+const PathManager = {
+    // Detect current directory depth (0 = root, 1 = subfolder)
+    getDepth() {
+        const path = window.location.pathname;
+        return (path.includes('/folder/') || path.includes('/tools/')) ? 1 : 0;
+    },
+
+    getPrefix() {
+        return this.getDepth() === 1 ? '../' : '';
+    },
+
+    getToolPath(toolId) {
+        return `${this.getPrefix()}tools/${toolId}.html`;
+    },
+
+    getFolderPath(folderId) {
+        return `${this.getPrefix()}folder/${folderId}.html`;
+    },
+
+    getHomePath() {
+        return `${this.getPrefix()}index.html`;
+    },
+
+    // Guard to prevent invalid navigation patterns
+    normalize(url) {
+        if (url.includes('folder/tools/')) {
+            console.warn('Invalid path detected and corrected:', url);
+            return url.replace('folder/tools/', 'tools/');
+        }
+        return url;
+    }
+};
+
 // App State
 let calcDisplay = '';
 let currentFolder = null;
@@ -590,6 +625,13 @@ let isPwaInstalled = window.matchMedia('(display-mode: standalone)').matches || 
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    // Clean up current URL if it has invalid patterns (Self-healing logic)
+    if (window.location.pathname.includes('folder/tools/')) {
+        const correctPath = window.location.pathname.replace('folder/tools/', 'tools/');
+        window.location.replace(correctPath);
+        return;
+    }
+
     loadSettings();
     applySettings();
     updateFolders();
@@ -724,23 +766,27 @@ function setupPwaInstall() {
 
 function updateInstallButtonState() {
     if (installAppBtn) {
+        // Reset state
         installAppBtn.classList.remove('is-installed');
         installAppBtn.disabled = false;
-        installAppBtn.textContent = '\uD83D\uDCF2 Install App';
+        installAppBtn.textContent = '📥 Install App';
         installAppBtn.title = '';
 
-        if (isPwaInstalled) {
+        // If the browser session says it's already installed
+        if (isPwaInstalled && !deferredInstallPrompt) {
             installAppBtn.disabled = true;
             installAppBtn.classList.add('is-installed');
-            installAppBtn.textContent = 'Installed \u2705';
+            installAppBtn.textContent = 'Installed ✅';
         } else if (!deferredInstallPrompt) {
+            // Hide or disable if not ready
             installAppBtn.disabled = true;
             installAppBtn.title = 'Install will be available once your browser allows it.';
         }
+        // If we have a prompt, the button is ALWAYS enabled even if isPwaInstalled is true (as the browser wouldn't send the prompt if already installed)
     }
 
     if (footerPwaContainer) {
-        if (deferredInstallPrompt && !isPwaInstalled) {
+        if (deferredInstallPrompt) {
             footerPwaContainer.style.display = 'block';
         } else {
             footerPwaContainer.style.display = 'none';
@@ -852,7 +898,7 @@ function renderFolders() {
                 return;
             }
             triggerHaptic('light');
-            openFolder(folder);
+            location.href = PathManager.getFolderPath(folder.id);
         });
 
         foldersGrid.appendChild(card);
@@ -885,8 +931,11 @@ function openFolder(folder, fromHistory = false) {
 
 // Render tools in a folder
 function renderToolsInFolder(folder) {
+    if (!toolsGrid) return;
     toolsGrid.innerHTML = '';
     
+    // Tools rendering logic utilizing centralized PathManager
+
     const folderTools = Array.isArray(folder.tools) ? folder.tools : [];
     folderTools.forEach(toolId => {
         const tool = tools.find(t => t.id === toolId);
@@ -894,7 +943,7 @@ function renderToolsInFolder(folder) {
 
         const card = document.createElement('a');
         card.className = 'tool-card';
-        card.href = tool.comingSoon ? '#' : `tools/${toolId}.html`;
+        card.href = tool.comingSoon ? '#' : PathManager.getToolPath(toolId);
         
         if (tool.comingSoon) {
             card.style.opacity = '0.6';
@@ -904,17 +953,14 @@ function renderToolsInFolder(folder) {
         
         card.innerHTML = `
             <div class="tool-card-header">
-                <div class="tool-icon">${tool.icon}</div>
+                <div class="tool-icon">${tool.icon || '🛠️'}</div>
             </div>
             <div class="tool-name">${tool.name}</div>
-            ${tool.comingSoon ? '<div style="font-size: 0.8rem; margin-top: 5px; color: #999;">Coming Soon</div>' : ''}
         `;
         
         if (!tool.comingSoon) {
             card.addEventListener('click', () => {
                 triggerHaptic('light');
-                // openTool is no longer needed for internal navigation, 
-                // but we keep it for backward compatibility or special cases
             });
         }
         toolsGrid.appendChild(card);
@@ -3986,7 +4032,7 @@ function displaySearchResults(results, query) {
         if (result.type === 'tool') {
             const link = document.createElement('a');
             link.className = 'search-result-item';
-            link.href = `tools/${item.id}.html`;
+            link.href = PathManager.getToolPath(item.id);
             link.innerHTML = `<span>${item.icon} ${item.name}</span>`;
             link.onclick = () => {
                 addToRecentSearches(item.name);

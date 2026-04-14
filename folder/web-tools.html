@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Development Tools - Infinity Kit⚡</title>
+    <meta name="description" content="Extract URL parameters, view meta tags, and encode/decode URLs. Free web utilities from Infinity Kit.">
+    <link rel="canonical" href="https://infinitykit.online/folder/web-tools.html">
+    <link rel="stylesheet" href="../app.css?v=16.3">
+    <link rel="shortcut icon" href="../icon-192.png" type="image/png">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "Web Tools",
+      "description": "Extract URL parameters, view meta tags, and encode/decode URLs.",
+      "url": "https://infinitykit.online/folder/web-tools.html"
+    }
+    </script>
+</head>
+<body>
+    <nav class="navbar"><div class="nav-logo" onclick="location.href='../index.html'">⚡INFINITY KIT</div></nav>
+    <div class="breadcrumb"><a href="../index.html">Home</a><span class="separator">&rsaquo;</span><span class="current">Web Tools</span></div>
+    <main class="tool-page-container category-layout">
+        <div class="tool-header"><h1 class="tool-title">🌐 Web Tools</h1></div>
+        <div class="tools-grid" id="toolsGrid"></div>
+    </main>
+    <script src="../main.js?v=16.3"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const folderId = 'web-tools';
+            const folder = folders.find(f => f.id === folderId);
+            if (folder) {
+                renderToolsInFolder(folder);
+                
+            }
+        });
+    </script>
+</body>
+</html>
