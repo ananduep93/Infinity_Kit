@@ -1,4 +1,4 @@
-console.log('Infinity Kit Version 16.4 Loaded - Centralized Path Resolver Active (Strict Fix)');
+console.log('Infinity Kit Version 16.5 Loaded - Script-Based Path Resolver Active (Failsafe Fix)');
 // Tip: If links fail, try a hard refresh (Ctrl + Shift + R) to clear browser cache.
 
 // Folders with Tools Data
@@ -132,6 +132,17 @@ const baseFolders = [
 // Dynamic folders array (will be updated with favorites)
 let folders = [];
 
+// App Global Settings (initialized with defaults)
+let appSettings = {
+    theme: 'light',
+    fontSize: 'medium',
+    cardSize: 'normal',
+    animationsEnabled: true,
+    favorites: [],
+    recentTools: [],
+    usageStats: {}
+};
+
 function getFavoriteFolderIds() {
     const favoriteIds = Array.isArray(appSettings?.favorites) ? appSettings.favorites : [];
     return favoriteIds.filter(id => baseFolders.some(folder => folder.id === id && !folder.isFavorites));
@@ -163,6 +174,9 @@ function updateFolders() {
         favFolder.tools = favoriteToolIds;
     }
 }
+
+// Initialize immediately so category pages can access 'folders' array
+updateFolders();
 
 // Tools Data
 const tools = [
@@ -585,9 +599,26 @@ const copyrightText = document.getElementById('copyrightText');
 // Centralized Path Management System
 const PathManager = {
     // Detect current directory depth (0 = root, 1 = subfolder)
+    // Uses segment analysis to avoid false positives from site root folder names
     getDepth() {
+        // Failsafe method: Check how the script itself was loaded.
+        // If loaded via '../main.js', we are in a subfolder.
+        const scripts = document.getElementsByTagName('script');
+        for (let i = 0; i < scripts.length; i++) {
+            const src = scripts[i].getAttribute('src');
+            if (src && src.includes('main.js')) {
+                if (src.startsWith('../')) return 1;
+                if (src.includes('folder/') || src.includes('tools/')) return 0; // Loaded from root into root
+            }
+        }
+        
+        // Fallback to path analysis if script detection fails
         const path = window.location.pathname;
-        return (path.includes('/folder/') || path.includes('/tools/')) ? 1 : 0;
+        const segments = path.split('/').filter(s => s !== '');
+        const hasSubdir = segments.some((s, i) => 
+            (s === 'folder' || s === 'tools') && i < segments.length - 1
+        );
+        return hasSubdir ? 1 : 0;
     },
 
     getPrefix() {
@@ -608,9 +639,10 @@ const PathManager = {
 
     // Guard to prevent invalid navigation patterns
     normalize(url) {
-        if (url.includes('folder/tools/')) {
-            console.warn('Invalid path detected and corrected:', url);
-            return url.replace('folder/tools/', 'tools/');
+        if (!url) return url;
+        if (url.includes('folder/tools/') || url.includes('tools/tools/')) {
+            console.warn('PathManager: Normalizing invalid path:', url);
+            return url.replace('folder/tools/', 'tools/').replace('tools/tools/', 'tools/');
         }
         return url;
     }
@@ -625,28 +657,35 @@ let isPwaInstalled = window.matchMedia('(display-mode: standalone)').matches || 
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    // Clean up current URL if it has invalid patterns (Self-healing logic)
-    if (window.location.pathname.includes('folder/tools/')) {
-        const correctPath = window.location.pathname.replace('folder/tools/', 'tools/');
-        window.location.replace(correctPath);
-        return;
+    try {
+        // Robust Self-healing logic for invalid URLs
+        const path = window.location.pathname;
+        if (path.includes('folder/tools/') || path.includes('tools/tools/')) {
+            const correctPath = path.replace('folder/tools/', 'tools/').replace('tools/tools/', 'tools/');
+            console.log('Path Guard: Auto-correcting URL to:', correctPath);
+            window.location.replace(correctPath);
+            return;
+        }
+
+        loadSettings();
+        applySettings();
+        // updateFolders() moved to top level
+        
+        if (typeof renderFolders === 'function') renderFolders();
+        if (typeof setupSafeListeners === 'function') setupSafeListeners();
+        if (typeof setupPwaInstall === 'function') setupPwaInstall();
+        if (typeof registerServiceWorker === 'function') registerServiceWorker();
+        if (typeof updateCopyrightYear === 'function') updateCopyrightYear();
+
+        // Initialize Notification System
+        if (window.NotificationManager) {
+            window.NotificationManager.init();
+        }
+
+        handleInitialNavigation();
+    } catch (e) {
+        console.error('Infinity Kit Initialization Error:', e);
     }
-
-    loadSettings();
-    applySettings();
-    updateFolders();
-    renderFolders();
-    setupSafeListeners();
-    setupPwaInstall();
-    registerServiceWorker();
-    updateCopyrightYear();
-
-    // Initialize Notification System
-    if (window.NotificationManager) {
-        window.NotificationManager.init();
-    }
-
-    handleInitialNavigation();
 });
 
 // Helper to safely set up event listeners or elements
@@ -678,6 +717,20 @@ function setupSafeListeners() {
             backToFolders(false);
         });
     }
+
+    // Modal click-outside
+    if (window && modal) {
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) closeTool();
+        });
+    }
+
+    // Global click-outside for search
+    document.addEventListener('click', (e) => {
+        if (searchResults && !e.target.closest('.search-container')) {
+            searchResults.style.display = 'none';
+        }
+    });
 }
 
 // Listener for Service Worker messages (Snooze, etc)
@@ -698,30 +751,28 @@ function handleInitialNavigation() {
     const hash = window.location.hash.substring(1);
     if (!hash) return;
 
+    if (!Array.isArray(folders) || !Array.isArray(tools)) return;
+
     const folder = folders.find(f => f.id === hash);
     const tool = tools.find(t => t.id === hash);
 
     if (folder || tool) {
-        // Inject home state into history so "back" returns to main grid instead of closing app
+        // Inject home state into history
         history.replaceState({ type: 'home' }, '', window.location.pathname + window.location.search);
         
         if (folder) {
-            openFolder(folder); // This will pushState for the folder
+            openFolder(folder);
         } else if (tool) {
-            // Find parent folder for tool
             const parent = folders.find(f => f.tools.includes(tool.id));
             if (parent) {
-                // First open parent folder visually
                 currentFolder = parent;
-                foldersGrid.style.display = 'none';
-                backButtonContainer.style.display = 'flex';
-                currentFolderTitle.textContent = `${parent.emoji} ${parent.name}`;
+                if (foldersGrid) foldersGrid.style.display = 'none';
+                if (backButtonContainer) backButtonContainer.style.display = 'flex';
+                if (currentFolderTitle) currentFolderTitle.textContent = `${parent.emoji} ${parent.name}`;
                 renderToolsInFolder(parent);
-                toolsGrid.style.display = 'grid';
-                // pushState for folder
+                if (toolsGrid) toolsGrid.style.display = 'grid';
                 history.pushState({ type: 'folder', folderId: parent.id }, '', `#${parent.id}`);
             }
-            // Then open tool which will push its own state
             openTool(tool.id, tool.name, tool.icon);
         }
     }
@@ -836,7 +887,8 @@ function registerServiceWorker() {
     }
 
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js').catch((error) => {
+        const swPath = `${PathManager.getPrefix()}service-worker.js`;
+        navigator.serviceWorker.register(swPath).catch((error) => {
             console.error('Service worker registration failed:', error);
         });
     });
@@ -3740,15 +3792,7 @@ function copyDuplicateText() {
 }
 
 // ========== SETTINGS SYSTEM ==========
-let appSettings = {
-    theme: 'light',
-    fontSize: 'medium',
-    cardSize: 'normal',
-    animationsEnabled: true,
-    favorites: [],
-    recentTools: [],
-    usageStats: {}
-};
+// appSettings declared at top level
 
 function loadSettings() {
     const saved = localStorage.getItem('infinityKitSettings');
