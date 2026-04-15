@@ -2095,6 +2095,44 @@ button:active {
     color: #666;
 }
 
+/* Folder & Tool Cards */
+.folder-favorite-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: #fff;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    font-size: 1.1rem;
+    z-index: 10;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.folder-card.favorite-folder {
+    border: 2px solid #ffcc00;
+    background: linear-gradient(135deg, rgba(255, 236, 179, 0.1) 0%, rgba(255, 204, 0, 0.05) 100%);
+}
+
+body.dark-mode .folder-card.favorite-folder {
+    border-color: #ffcc00;
+    background: linear-gradient(135deg, rgba(255, 204, 0, 0.1) 0%, rgba(255, 204, 0, 0.05) 100%);
+}
+
+.folder-card.long-pressing {
+    transform: scale(0.95);
+    filter: brightness(0.9);
+}
+
 /* Dark Mode */
 body.dark-mode {
     background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);

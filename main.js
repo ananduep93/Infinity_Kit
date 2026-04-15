@@ -175,8 +175,7 @@ function updateFolders() {
     }
 }
 
-// Initialize immediately so category pages can access 'folders' array
-updateFolders();
+// updateFolders initialized during loadSettings for correctly syncing favorites
 
 // Tools Data
 const tools = [
@@ -653,7 +652,7 @@ let calcDisplay = '';
 let currentFolder = null;
 let recentSearchesList = JSON.parse(localStorage.getItem('recentSearches')) || [];
 let deferredInstallPrompt = null;
-let isPwaInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+let isPwaInstalled = false; // Will be updated dynamically
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -669,7 +668,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         loadSettings();
         applySettings();
-        // updateFolders() moved to top level
+        updateFolders(); // Called after loadSettings so favorites are populated correctly
         
         if (typeof renderFolders === 'function') renderFolders();
         if (typeof setupSafeListeners === 'function') setupSafeListeners();
@@ -778,8 +777,28 @@ function handleInitialNavigation() {
     }
 }
 
-function setupPwaInstall() {
+async function syncPwaInstallationStatus() {
+    // 1. Check if we're currently in standalone mode
+    let currentlyStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    
+    // 2. Try modern API to check for related apps (installed PWA)
+    let relatedAppsInstalled = false;
+    if ('getInstalledRelatedApps' in navigator) {
+        try {
+            const relatedApps = await navigator.getInstalledRelatedApps();
+            relatedAppsInstalled = relatedApps.length > 0;
+        } catch (e) {
+            console.warn('Unable to fetch installed related apps:', e);
+        }
+    }
+
+    isPwaInstalled = currentlyStandalone || relatedAppsInstalled;
     updateInstallButtonState();
+}
+
+function setupPwaInstall() {
+    syncPwaInstallationStatus();
+    
     if (installAppBtn) {
         installAppBtn.addEventListener('click', handleInstallApp);
     }
@@ -829,7 +848,8 @@ function updateInstallButtonState() {
             installAppBtn.classList.add('is-installed');
             installAppBtn.textContent = 'Installed ✅';
         } else if (!deferredInstallPrompt) {
-            // Hide or disable if not ready
+            // If we don't have a prompt and not in standalone, reset state
+            isPwaInstalled = false;
             installAppBtn.disabled = true;
             installAppBtn.title = 'Install will be available once your browser allows it.';
         }
@@ -944,6 +964,14 @@ function renderFolders() {
         card.addEventListener('mouseleave', cancelLongPress);
         card.addEventListener('touchend', cancelLongPress);
         card.addEventListener('touchcancel', cancelLongPress);
+        
+        // Prevent system context menu during long press
+        card.addEventListener('contextmenu', (e) => {
+            if (longPressTriggered) {
+                e.preventDefault();
+            }
+        });
+
         card.addEventListener('click', () => {
             if (longPressTriggered) {
                 longPressTriggered = false;
@@ -3821,6 +3849,11 @@ function loadSettings() {
         appSettings.usageStats = {};
     }
 
+    // Force-clear any legacy or potentially cached 'installed' flags
+    localStorage.removeItem('installed');
+    localStorage.removeItem('isInstalled');
+    sessionStorage.removeItem('installed');
+
     updateSettingsUI();
 }
 
@@ -3999,7 +4032,6 @@ function toggleFavoriteFolder(folderId) {
     saveSettings();
     updateFolders();
     renderFolders();
-    updateFavoritesList();
 
     // Keep currently open folder in sync
     if (currentFolder) {

@@ -29,10 +29,24 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const folderId = 'favorites';
-            // Wait for settings and folders to load in main.js
             
+            // Poll for settings and main.js initialization
+            const pollInterval = setInterval(() => {
+                if (typeof folders !== 'undefined' && typeof updateFolders === 'function') {
+                    // Check if favorites have been loaded into appSettings
+                    if (appSettings && Array.isArray(appSettings.favorites)) {
+                        clearInterval(pollInterval);
+                        updateFolders(); // Re-build virtual folders with favorite tools
+                        const folder = folders.find(f => f.id === folderId);
+                        if (folder) {
+                            renderToolsInFolder(folder);
+                        }
+                    }
                 }
-            }, 500);
+            }, 50);
+
+            // Safety timeout
+            setTimeout(() => clearInterval(pollInterval), 5000);
         });
     </script>
 </body>
