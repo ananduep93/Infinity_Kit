@@ -1769,8 +1769,6 @@ button:active {
 .rotation-btn:hover {
     background: rgba(102, 126, 234, 0.15);
     border-color: #667eea;
-}
-    border-color: #667eea;
     box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
 }
 
