@@ -96,3 +96,41 @@ window.addEventListener('DOMContentLoaded', () => {
         copyrightText.textContent = `\u00A9 ${new Date().getFullYear()} Infinity Kit. All rights reserved.`;
     }
 });
+
+// Modern Content Section Logic (Reveal on Scroll & Accordion)
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. FAQ Accordion Logic
+    const faqQuestions = document.querySelectorAll('.faq-question');
+    faqQuestions.forEach(question => {
+        question.addEventListener('click', () => {
+            const item = question.parentElement;
+            const isActive = item.classList.contains('active');
+            
+            // Close other items
+            document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+            
+            if (!isActive) {
+                item.classList.add('active');
+                if (typeof triggerHaptic === 'function') triggerHaptic('light');
+            }
+        });
+    });
+
+    // 2. Scroll Reveal Animation Logic
+    const revealCards = document.querySelectorAll('.info-card');
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('reveal-active');
+                revealObserver.unobserve(entry.target); // Only animate once
+            }
+        });
+    }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    });
+
+    revealCards.forEach(card => {
+        revealObserver.observe(card);
+    });
+});
