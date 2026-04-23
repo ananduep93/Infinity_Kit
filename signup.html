@@ -274,6 +274,9 @@
         const emailInput = document.getElementById('emailInput');
         const passwordInput = document.getElementById('passwordInput');
 
+        // Handle redirect result for mobile
+        authService.handleRedirectResult();
+
         // Email/Password Sign Up
         emailSignUpBtn.addEventListener('click', async () => {
             const name = nameInput.value.trim();

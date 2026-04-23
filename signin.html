@@ -292,6 +292,9 @@
         const googleBtn = document.getElementById('googleSignInBtn');
         const emailInput = document.getElementById('emailInput');
         const passwordInput = document.getElementById('passwordInput');
+        
+        // Handle redirect result for mobile
+        authService.handleRedirectResult();
 
         // Email/Password Sign In
         emailSignInBtn.addEventListener('click', async () => {

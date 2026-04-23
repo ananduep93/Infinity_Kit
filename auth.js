@@ -42,6 +42,8 @@ export const authService = {
             if (result) {
                 sessionStorage.setItem('isLoggedIn', 'true');
                 sessionStorage.setItem('userId', result.user.uid);
+                // After redirect success, send them home
+                window.location.href = 'index.html';
                 return result.user;
             }
         } catch (error) {
