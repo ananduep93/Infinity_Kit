@@ -24,8 +24,8 @@ export const authService = {
                 if (isMobile) throw new Error("Force redirect on mobile"); // Direct to redirect for mobile
                 
                 const result = await signInWithPopup(auth, googleProvider);
-                sessionStorage.setItem('isLoggedIn', 'true');
-                sessionStorage.setItem('userId', result.user.uid);
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userId', result.user.uid);
                 return result.user;
             } catch (popupError) {
                 // If popup is blocked or it's mobile, use redirect
@@ -41,14 +41,18 @@ export const authService = {
     // Handle the result of a redirect sign-in (call this on app load)
     async handleRedirectResult() {
         try {
+            console.log("Checking for redirect result...");
             const result = await getRedirectResult(auth);
             if (result) {
-                sessionStorage.setItem('isLoggedIn', 'true');
-                sessionStorage.setItem('userId', result.user.uid);
+                console.log("Redirect success for user:", result.user.uid);
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userId', result.user.uid);
                 
                 // Determine root path for redirect
                 const isToolPage = window.location.pathname.includes('/tools/');
-                window.location.href = isToolPage ? '../index.html' : 'index.html';
+                const target = isToolPage ? '../index.html' : 'index.html';
+                console.log("Redirecting to:", target);
+                window.location.href = target;
                 
                 return result.user;
             }
@@ -64,8 +68,8 @@ export const authService = {
             if (name) {
                 await updateProfile(result.user, { displayName: name });
             }
-            sessionStorage.setItem('isLoggedIn', 'true');
-            sessionStorage.setItem('userId', result.user.uid);
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userId', result.user.uid);
             return result.user;
         } catch (error) {
             console.error("Email Sign-Up Error:", error);
@@ -76,8 +80,8 @@ export const authService = {
     async loginWithEmail(email, password) {
         try {
             const result = await signInWithEmailAndPassword(auth, email, password);
-            sessionStorage.setItem('isLoggedIn', 'true');
-            sessionStorage.setItem('userId', result.user.uid);
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userId', result.user.uid);
             return result.user;
         } catch (error) {
             console.error("Email Sign-In Error:", error);
@@ -88,8 +92,8 @@ export const authService = {
     async loginAnonymously() {
         try {
             const result = await signInAnonymously(auth);
-            sessionStorage.setItem('isLoggedIn', 'true');
-            sessionStorage.setItem('userId', result.user.uid);
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userId', result.user.uid);
             return result.user;
         } catch (error) {
             console.error("Anonymous Sign-In Error:", error);
@@ -105,13 +109,13 @@ export const authService = {
         try {
             await signOut(auth);
             
-            // Clear local data for privacy (Optionally keep infinityKitStats if you want global stats)
+            // Clear local data for privacy
             const toolKeys = ['todos', 'savedPasswords', 'quickNotes', 'infinityKitExpenseDB', 'infinityKitSettings', 'recentTools', 'recentSearches'];
             toolKeys.forEach(key => localStorage.removeItem(key));
             
-            sessionStorage.removeItem('isLoggedIn');
-            sessionStorage.removeItem('userId');
-            window.location.href = '/index.html';
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userId');
+            window.location.href = window.location.pathname.includes('/tools/') ? '../index.html' : 'index.html';
         } catch (error) {
             console.error("Logout failed:", error);
         }
@@ -120,11 +124,11 @@ export const authService = {
     onAuthChange(callback) {
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                sessionStorage.setItem('isLoggedIn', 'true');
-                sessionStorage.setItem('userId', user.uid);
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userId', user.uid);
             } else {
-                sessionStorage.removeItem('isLoggedIn');
-                sessionStorage.removeItem('userId');
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('userId');
             }
             callback(user);
         });
@@ -135,7 +139,7 @@ export const authService = {
     },
 
     isLoggedIn() {
-        return sessionStorage.getItem('isLoggedIn') === 'true';
+        return localStorage.getItem('isLoggedIn') === 'true';
     }
 };
 
