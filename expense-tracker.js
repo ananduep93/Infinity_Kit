@@ -22,8 +22,20 @@ function cleanupExpenseToolSync() {
     expenseToolSyncCleanup = null;
 }
 
-function syncExpenseTool(renderFn) {
+async function syncExpenseTool(renderFn) {
     cleanupExpenseToolSync();
+
+    // Wait for sync service
+    for (let i = 0; i < 10; i++) {
+        if (window.syncService) break;
+        await new Promise(r => setTimeout(r, 200));
+    }
+
+    // Fetch fresh cloud data before rendering if logged in
+    if (window.syncService) {
+        await window.syncService.getData(EXPENSE_DB_KEY);
+    }
+
     const safeRender = () => {
         try {
             renderFn();
@@ -100,13 +112,8 @@ function getExpenseDB() {
     }
 }
 
-function saveExpenseDB(db, notify = true) {
-    localStorage.setItem(EXPENSE_DB_KEY, JSON.stringify(db));
-    
-    // Cloud Sync if logged in
-    if (window.AuthHandler && window.AuthHandler.user && !window.AuthHandler.isMigrating) {
-        window.AuthHandler.syncUp('toolData.expenses', db);
-    }
+async function saveExpenseDB(db, notify = true) {
+    await window.syncService.saveData(EXPENSE_DB_KEY, db);
 
     if (notify) {
         window.dispatchEvent(new Event(EXPENSE_DATA_EVENT));

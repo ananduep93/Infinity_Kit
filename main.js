@@ -1107,7 +1107,7 @@ function showRecentSearches() {
 }
 
 // Add to recent searches
-function addToRecentSearches(search) {
+async function addToRecentSearches(search) {
     // Remove if already exists
     recentSearchesList = recentSearchesList.filter(item => item !== search);
     
@@ -1117,12 +1117,11 @@ function addToRecentSearches(search) {
     // Keep only last 10
     recentSearchesList = recentSearchesList.slice(0, 10);
     
-    // Save to localStorage
-    localStorage.setItem('recentSearches', JSON.stringify(recentSearchesList));
-
-    // Cloud Sync if logged in
-    if (window.AuthHandler && window.AuthHandler.user && !window.AuthHandler.isMigrating) {
-        window.AuthHandler.syncUp('toolData.recentSearches', recentSearchesList);
+    // Save to syncService
+    if (window.syncService) {
+        await window.syncService.saveData('recentSearches', recentSearchesList);
+    } else {
+        localStorage.setItem('recentSearches', JSON.stringify(recentSearchesList));
     }
 }
 
@@ -1694,8 +1693,19 @@ function handleCalcKeyPress(event) {
 }
 
 // ==================== TO-DO LIST ====================
-function loadToDoList() {
-    const todos = JSON.parse(localStorage.getItem('todos')) || [];
+async function loadToDoList() {
+    // Wait for sync service
+    for (let i = 0; i < 10; i++) {
+        if (window.syncService) break;
+        await new Promise(r => setTimeout(r, 200));
+    }
+
+    let todos = [];
+    if (window.syncService) {
+        todos = await window.syncService.getData('todos') || [];
+    } else {
+        todos = JSON.parse(localStorage.getItem('todos')) || [];
+    }
     
     let html = `
         <div class="todolist-content">
@@ -1729,7 +1739,7 @@ function loadToDoList() {
     });
 }
 
-function addTodo() {
+async function addTodo() {
     const input = document.getElementById('todoInput');
     const text = input.value.trim();
 
@@ -1738,26 +1748,26 @@ function addTodo() {
         return;
     }
 
-    const todos = JSON.parse(localStorage.getItem('todos')) || [];
+    const todos = await window.syncService.getData('todos') || [];
     todos.push({ text, completed: false });
-    localStorage.setItem('todos', JSON.stringify(todos));
+    await window.syncService.saveData('todos', todos);
     loadToDoList(); // Refresh
     showToast('Task added!', 'success');
 }
 
-function toggleTodo(index) {
-    const todos = JSON.parse(localStorage.getItem('todos')) || [];
+async function toggleTodo(index) {
+    const todos = await window.syncService.getData('todos') || [];
     todos[index].completed = !todos[index].completed;
-    localStorage.setItem('todos', JSON.stringify(todos));
+    await window.syncService.saveData('todos', todos);
     loadToDoList();
 }
 
-function deleteTodo(index) {
+async function deleteTodo(index) {
     if (!confirm('Are you sure you want to delete this task?')) return;
 
-    const todos = JSON.parse(localStorage.getItem('todos')) || [];
+    const todos = await window.syncService.getData('todos') || [];
     todos.splice(index, 1);
-    localStorage.setItem('todos', JSON.stringify(todos));
+    await window.syncService.saveData('todos', todos);
     loadToDoList();
     showToast('Task deleted!', 'success');
 }
@@ -1929,7 +1939,7 @@ function copyPassword() {
     showToast('Password copied!', 'success');
 }
 
-function savePwd() {
+async function savePwd() {
     const pwd = window.currentPassword;
     if (!pwd) {
         showToast('Generate a password first', 'error');
@@ -1939,15 +1949,27 @@ function savePwd() {
     const appName = prompt('Enter application/service name:');
     if (!appName) return;
 
-    const passwords = JSON.parse(localStorage.getItem('savedPasswords')) || [];
+    const passwords = await window.syncService.getData('savedPasswords') || [];
     passwords.push({ appName, password: pwd, date: new Date().toLocaleString() });
-    localStorage.setItem('savedPasswords', JSON.stringify(passwords));
+    await window.syncService.saveData('savedPasswords', passwords);
     showToast('Password saved!', 'success');
 }
 
 // ==================== PASSWORD SAVER ====================
-function loadPasswordSaver() {
-    const passwords = JSON.parse(localStorage.getItem('savedPasswords')) || [];
+async function loadPasswordSaver() {
+    // Wait for sync service
+    for (let i = 0; i < 10; i++) {
+        if (window.syncService) break;
+        await new Promise(r => setTimeout(r, 200));
+    }
+
+    let passwords = [];
+    if (window.syncService) {
+        passwords = await window.syncService.getData('savedPasswords') || [];
+    } else {
+        const saved = localStorage.getItem('savedPasswords');
+        passwords = saved ? JSON.parse(saved) : [];
+    }
 
     let html = `
         <div class="tool-form">
@@ -2005,7 +2027,7 @@ function togglePasswordVisibility(index) {
     }
 }
 
-function saveSinglePassword() {
+async function saveSinglePassword() {
     const appName = document.getElementById('appName').value.trim();
     const password = document.getElementById('appPassword').value;
 
@@ -2014,9 +2036,9 @@ function saveSinglePassword() {
         return;
     }
 
-    const passwords = JSON.parse(localStorage.getItem('savedPasswords')) || [];
+    const passwords = await window.syncService.getData('savedPasswords') || [];
     passwords.push({ appName, password, date: new Date().toLocaleString() });
-    localStorage.setItem('savedPasswords', JSON.stringify(passwords));
+    await window.syncService.saveData('savedPasswords', passwords);
     
     document.getElementById('appName').value = '';
     document.getElementById('appPassword').value = '';
@@ -2024,26 +2046,38 @@ function saveSinglePassword() {
     showToast('Password saved!', 'success');
 }
 
-function copyPasswordItem(index) {
-    const passwords = JSON.parse(localStorage.getItem('savedPasswords')) || [];
+async function copyPasswordItem(index) {
+    const passwords = await window.syncService.getData('savedPasswords') || [];
     navigator.clipboard.writeText(passwords[index].password);
     showToast('Password copied!', 'success');
 }
 
-function deletePasswordItem(index) {
+async function deletePasswordItem(index) {
     if (!confirm('Are you sure you want to delete this password?')) return;
 
-    const passwords = JSON.parse(localStorage.getItem('savedPasswords')) || [];
+    const passwords = await window.syncService.getData('savedPasswords') || [];
     passwords.splice(index, 1);
-    localStorage.setItem('savedPasswords', JSON.stringify(passwords));
+    await window.syncService.saveData('savedPasswords', passwords);
     loadPasswordSaver();
     showToast('Password deleted!', 'success');
 }
 
 // ==================== DECISION MAKER ====================
 // ==================== QUICK NOTES ====================
-function loadQuickNotes() {
-    const notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
+async function loadQuickNotes() {
+    // Wait for sync service
+    for (let i = 0; i < 10; i++) {
+        if (window.syncService) break;
+        await new Promise(r => setTimeout(r, 200));
+    }
+
+    let notes = [];
+    if (window.syncService) {
+        notes = await window.syncService.getData('quickNotes') || [];
+    } else {
+        const saved = localStorage.getItem('quickNotes');
+        notes = saved ? JSON.parse(saved) : [];
+    }
 
     let html = `
         <div class="tool-form">
@@ -2077,7 +2111,7 @@ function loadQuickNotes() {
     toolContent.innerHTML = html;
 }
 
-function saveNote() {
+async function saveNote() {
     const input = document.getElementById('noteInput');
     const content = input.value.trim();
 
@@ -2087,21 +2121,21 @@ function saveNote() {
     }
 
     const title = content.substring(0, 50);
-    const notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
+    const notes = await window.syncService.getData('quickNotes') || [];
     notes.push({ title, content, date: new Date().toLocaleString() });
-    localStorage.setItem('quickNotes', JSON.stringify(notes));
+    await window.syncService.saveData('quickNotes', notes);
 
     input.value = '';
     loadQuickNotes();
     showToast('Note saved!', 'success');
 }
 
-function deleteNote(index) {
+async function deleteNote(index) {
     if (!confirm('Are you sure?')) return;
 
-    const notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
+    const notes = await window.syncService.getData('quickNotes') || [];
     notes.splice(index, 1);
-    localStorage.setItem('quickNotes', JSON.stringify(notes));
+    await window.syncService.saveData('quickNotes', notes);
     loadQuickNotes();
     showToast('Note deleted!', 'success');
 }
@@ -3892,14 +3926,25 @@ function copyDuplicateText() {
 // ========== SETTINGS SYSTEM ==========
 // appSettings declared at top level
 
-function loadSettings() {
-    const saved = localStorage.getItem('infinityKitSettings');
-    if (saved) {
-        try {
-            appSettings = JSON.parse(saved);
-        } catch (e) {
-            console.log('Error loading settings, using defaults');
+async function loadSettings() {
+    // Wait for sync service
+    for (let i = 0; i < 10; i++) {
+        if (window.syncService) break;
+        await new Promise(r => setTimeout(r, 200));
+    }
+
+    let settings = null;
+    if (window.syncService) {
+        settings = await window.syncService.getData('infinityKitSettings');
+    } else {
+        const saved = localStorage.getItem('infinityKitSettings');
+        if (saved) {
+            try { settings = JSON.parse(saved); } catch(e) {}
         }
+    }
+
+    if (settings) {
+        appSettings = settings;
     }
 
     if (!Array.isArray(appSettings.favorites)) {
@@ -3927,21 +3972,8 @@ function loadSettings() {
     updateSettingsUI();
 }
 
-function saveSettings() {
-    localStorage.setItem('infinityKitSettings', JSON.stringify(appSettings));
-    
-    // Cloud Sync if logged in
-    if (window.AuthHandler && window.AuthHandler.user && !window.AuthHandler.isMigrating) {
-        window.AuthHandler.syncUp('preferences', {
-            theme: appSettings.theme,
-            fontSize: appSettings.fontSize,
-            cardSize: appSettings.cardSize,
-            animationsEnabled: appSettings.animationsEnabled
-        });
-        window.AuthHandler.syncUp('favorites', appSettings.favorites);
-        window.AuthHandler.syncUp('toolData.recentTools', appSettings.recentTools);
-        window.AuthHandler.syncUp('toolData.usageStats', appSettings.usageStats);
-    }
+async function saveSettings() {
+    await window.syncService.saveData('infinityKitSettings', appSettings);
 }
 
 function applySettings() {

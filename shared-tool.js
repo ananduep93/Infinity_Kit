@@ -16,22 +16,61 @@
 })();
 
 // Track tool usage
-function trackToolUsage(toolId) {
+async function trackToolUsage(toolId) {
     try {
-        const stats = JSON.parse(localStorage.getItem('infinityKitStats')) || {};
+        // Wait for sync service to initialize if it's currently loading
+        for (let i = 0; i < 10; i++) {
+            if (window.syncService) break;
+            await new Promise(r => setTimeout(r, 200));
+        }
+
+        let stats = {};
+        if (window.syncService) {
+            stats = await window.syncService.getData('infinityKitStats') || {};
+        } else {
+            stats = JSON.parse(localStorage.getItem('infinityKitStats')) || {};
+        }
+        
         stats[toolId] = (stats[toolId] || 0) + 1;
-        localStorage.setItem('infinityKitStats', JSON.stringify(stats));
-    } catch (e) {}
+        
+        if (window.syncService) {
+            await window.syncService.saveData('infinityKitStats', stats);
+        } else {
+            localStorage.setItem('infinityKitStats', JSON.stringify(stats));
+        }
+    } catch (e) {
+        console.error("Error tracking tool usage:", e);
+    }
 }
 
 // Add to recently used
-function addRecentTool(toolId, toolName) {
+async function addRecentTool(toolId, toolName) {
     try {
-        let recent = JSON.parse(localStorage.getItem('recentTools')) || [];
+        // Wait for sync service to initialize
+        for (let i = 0; i < 10; i++) {
+            if (window.syncService) break;
+            await new Promise(r => setTimeout(r, 200));
+        }
+
+        let recent = [];
+        if (window.syncService) {
+            recent = await window.syncService.getData('recentTools') || [];
+        } else {
+            recent = JSON.parse(localStorage.getItem('recentTools')) || [];
+        }
+
         recent = recent.filter(t => t.id !== toolId);
         recent.unshift({ id: toolId, name: toolName, time: Date.now() });
-        localStorage.setItem('recentTools', JSON.stringify(recent.slice(0, 10)));
-    } catch (e) {}
+        recent = recent.slice(0, 10);
+
+        if (window.syncService) {
+            await window.syncService.saveData('recentTools', recent);
+        } else {
+            localStorage.setItem('recentTools', JSON.stringify(recent));
+        }
+    } catch (e) {
+        console.error("Error adding recent tool:", e);
+    }
 }
 
 // Toast Notifications
@@ -95,6 +134,15 @@ window.addEventListener('DOMContentLoaded', () => {
     if (copyrightText) {
         copyrightText.textContent = `\u00A9 ${new Date().getFullYear()} Infinity Kit. All rights reserved.`;
     }
+
+    // Load Auth & Sync Entry Point (Module)
+    const isToolPage = window.location.pathname.includes('/tools/');
+    const base = isToolPage ? '../' : '';
+
+    const authScript = document.createElement('script');
+    authScript.type = 'module';
+    authScript.src = base + 'auth-ui.js';
+    document.head.appendChild(authScript);
 });
 
 // Modern Content Section Logic (Reveal on Scroll & Accordion)
