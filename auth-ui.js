@@ -71,6 +71,7 @@ export const authUI = {
         // Handle redirect result for mobile users
         this.handleMobileRedirect();
 
+        // Standard auth state listener
         authService.onAuthChange((user) => {
             this.updateNavbar();
             
@@ -83,8 +84,6 @@ export const authUI = {
                 // Hide any existing prompts
                 const prompt = document.getElementById('one-tap-prompt');
                 if (prompt) prompt.remove();
-            } else {
-                // Google One Tap prompt removed as per user request
             }
         });
 

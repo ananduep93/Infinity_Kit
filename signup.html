@@ -248,16 +248,6 @@
                 <button class="btn-primary" id="emailSignUpBtn">Get Started</button>
             </form>
 
-            <div class="divider">
-                <span>Or sign up with</span>
-            </div>
-
-            <div class="social-buttons">
-                <button class="social-btn" id="googleSignUpBtn" type="button" title="Sign up with Google">
-                    <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z" fill="#4285F4"/><path d="M6.3 14.7l6.6 4.8C14.7 16.2 19.1 14 24 14c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.2 2 9.4 7.2 6.3 14.7z" fill="#EA4335"/><path d="M24 46c5.6 0 10.6-2.1 14.5-5.5l-6.9-5.7c-2.1 1.4-4.7 2.2-7.6 2.2-6.9 0-12.7-4.7-14.8-11L2.4 31C5.5 39.8 14 46 24 46z" fill="#34A853"/><path d="M44.5 20H24v8.5h11.8c-.8 2.2-2.1 4.1-3.8 5.5l6.9 5.7c4.1-3.8 6.6-9.5 6.6-15.7 0-1.3-.2-2.7-.5-4z" fill="#FBBC05"/></svg>
-                </button>
-            </div>
-
             <div class="auth-footer">
                 Already have an account? <a href="signin.html">Sign In</a>
             </div>
@@ -270,7 +260,6 @@
         import { authUI } from './auth-ui.js';
 
         const emailSignUpBtn = document.getElementById('emailSignUpBtn');
-        const googleBtn = document.getElementById('googleSignUpBtn');
         const nameInput = document.getElementById('nameInput');
         const emailInput = document.getElementById('emailInput');
         const passwordInput = document.getElementById('passwordInput');
@@ -307,27 +296,7 @@
             }
         });
 
-        // Google Sign Up
-        googleBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            try {
-                googleBtn.disabled = true;
-                googleBtn.style.opacity = '0.5';
-                
-                await authService.loginWithGoogle();
-                
-                if (window.syncService) {
-                    await syncService.syncLocalToCloud();
-                }
-                
-                window.location.href = 'index.html';
-            } catch (error) {
-                console.error(error);
-                alert('Google Sign-up failed: ' + error.message);
-                googleBtn.disabled = false;
-                googleBtn.style.opacity = '1';
-            }
-        });
+        // Google Sign Up removed as per user request
     </script>
 </body>
 </html>
