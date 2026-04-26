@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey Builder - Infinity Kit⚡</title>
+    <meta name="description" content="Build professional surveys with various question types. Free online tool from Infinity Kit.">
+    <link rel="stylesheet" href="../app.css?v=16.7.20260426.1251">
+    <link rel="shortcut icon" href="../icon-192.png?v=16.7.20260426.1251" type="image/png">
+    <script src="../shared-tool.js?v=16.7.20260426.1251"></script>
+    <style>
+        .tool-page-container { max-width: 800px; margin: 20px auto; padding: 20px; }
+        .tool-header { text-align: center; margin-bottom: 30px; }
+        .tool-title { font-size: 2.5rem; margin-bottom: 10px; }
+        .survey-builder-container { display: flex; flex-direction: column; gap: 20px; }
+        .survey-input-title { font-size: 1.5rem; font-weight: bold; width: 100%; border: none; background: transparent; padding: 10px; border-bottom: 2px solid #ddd; }
+        .survey-input-desc { width: 100%; border: none; background: transparent; padding: 10px; resize: vertical; min-height: 60px; }
+        .question-card { padding: 20px; border-radius: 12px; position: relative; margin-bottom: 15px; }
+        .question-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .question-number { font-weight: bold; color: var(--primary-color, #667eea); }
+        .required { color: #ff4d4d; margin-left: 5px; }
+        .builder-actions { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
+        .btn-add-question { background: var(--secondary-color, #764ba2); color: white; padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; }
+        .btn-save-survey { background: var(--primary-color, #667eea); color: white; padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; }
+        .survey-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .survey-modal-content { background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 500px; display: flex; flex-direction: column; gap: 15px; }
+        [data-theme="dark"] .survey-modal-content { background: #2d3436; color: white; }
+        .survey-modal-content input, .survey-modal-content select, .survey-modal-content textarea { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ddd; }
+        .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; }
+        .image-options-preview { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+        .preview-img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #eee; }
+    </style>
+</head>
+<body>
+    <nav class="navbar"><div class="nav-logo" onclick="location.href='../index.html'">⚡INFINITY KIT</div></nav>
+    <div class="breadcrumb">
+        <a href="../index.html">Home</a><span class="separator">&rsaquo;</span>
+        <a href="../folder/survey-hub.html">Survey Hub</a><span class="separator">&rsaquo;</span>
+        <span class="current">Survey Builder</span>
+    </div>
+    <main class="tool-page-container">
+        <a href='../folder/survey-hub.html' class='back-link'><span>&larr;</span> Back to Hub</a>
+        <div class="tool-header"><h1 class="tool-title">🛠️ Survey Builder</h1></div>
+        <div id="toolContent" class="glass-panel">
+            <div class="loading-placeholder">Initializing builder...</div>
+        </div>
+    </main>
+    <footer class="footer"><div class="footer-links"><a href="../index.html">Home</a></div></footer>
+
+    <script src="../notifications.js?v=16.7.20260426.1251"></script>
+    <script src="../main.js?v=16.7.20260426.1251"></script>
+    <script type="module" src="../survey-hub.js?v=16.7.20260426.1251"></script>
+    <script>
+        window.toolContent = document.getElementById('toolContent');
+        window.toolTitle = { textContent: '' };
+        document.addEventListener('DOMContentLoaded', () => {
+            const pollSync = setInterval(() => {
+                if (typeof loadSurveyBuilder === 'function') {
+                    clearInterval(pollSync);
+                    loadSurveyBuilder();
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

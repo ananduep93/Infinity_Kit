@@ -141,6 +141,11 @@ function addCacheMetaTags(content) {
     return content;
 }
 
+function updateVersionInScripts(content) {
+    const versionScriptRegex = /(const currentVersion = ")[^"]*("; \/\/ This will be updated by cache-buster\.js)/gi;
+    return content.replace(versionScriptRegex, `$1${newVersion}$2`);
+}
+
 // Process a single file
 function processFile(filePath) {
     try {
@@ -151,6 +156,7 @@ function processFile(filePath) {
         content = updateUrl(content, 'script', 'src');
         content = updateUrl(content, 'img', 'src');
         content = updateVersionBadge(content);
+        content = updateVersionInScripts(content);
         content = addCacheMetaTags(content);
 
         if (content !== originalContent) {
@@ -161,6 +167,7 @@ function processFile(filePath) {
         console.error(`❌ Error processing ${filePath}:`, error.message);
     }
 }
+
 
 // Recursive directory scan
 function scanDirectory(dir) {

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Surveys - Infinity Kit⚡</title>
+    <meta name="description" content="Manage your created surveys. View responses, edit, or delete surveys. Free online tool from Infinity Kit.">
+    <link rel="stylesheet" href="../app.css?v=16.7.20260426.1251">
+    <link rel="shortcut icon" href="../icon-192.png?v=16.7.20260426.1251" type="image/png">
+    <style>
+        .tool-page-container { max-width: 900px; margin: 20px auto; padding: 20px; }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .surveys-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .survey-card { padding: 20px; border-radius: 15px; display: flex; flex-direction: column; gap: 10px; transition: transform 0.2s; }
+        .survey-card:hover { transform: translateY(-5px); }
+        .survey-card h3 { margin: 0; font-size: 1.25rem; color: var(--primary-color, #667eea); }
+        .survey-date { font-size: 0.85rem; color: #666; }
+        .survey-stats { display: flex; align-items: center; gap: 10px; font-weight: bold; margin: 10px 0; }
+        .survey-actions { display: flex; gap: 10px; margin-top: auto; border-top: 1px solid #eee; pt: 10px; }
+        .survey-actions button { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #ddd; background: #f9f9f9; cursor: pointer; font-size: 1.1rem; }
+        .survey-actions button:hover { background: #eee; }
+        [data-theme="dark"] .survey-card { background: rgba(255,255,255,0.05); }
+        [data-theme="dark"] .survey-actions button { background: #3d3d3d; border-color: #555; }
+        .empty-state { text-align: center; padding: 50px; }
+        .empty-state button { margin-top: 15px; padding: 10px 20px; background: var(--primary-color, #667eea); color: white; border: none; border-radius: 8px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <nav class="navbar"><div class="nav-logo" onclick="location.href='../index.html'">⚡INFINITY KIT</div></nav>
+    <div class="breadcrumb">
+        <a href="../index.html">Home</a><span class="separator">&rsaquo;</span>
+        <a href="../folder/survey-hub.html">Survey Hub</a><span class="separator">&rsaquo;</span>
+        <span class="current">My Surveys</span>
+    </div>
+    <main class="tool-page-container">
+        <a href='../folder/survey-hub.html' class='back-link'><span>&larr;</span> Back to Hub</a>
+        <div id="toolContent">
+            <div class="loading-placeholder">Loading dashboard...</div>
+        </div>
+    </main>
+    <footer class="footer"><div class="footer-links"><a href="../index.html">Home</a></div></footer>
+
+    <script src="../notifications.js?v=16.7.20260426.1251"></script>
+    <script src="../main.js?v=16.7.20260426.1251"></script>
+    <script type="module" src="../survey-hub.js?v=16.7.20260426.1251"></script>
+    <script>
+        window.toolContent = document.getElementById('toolContent');
+        document.addEventListener('DOMContentLoaded', () => {
+            const pollSync = setInterval(() => {
+                if (typeof loadMySurveys === 'function') {
+                    clearInterval(pollSync);
+                    loadMySurveys();
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

@@ -37,6 +37,16 @@ const baseFolders = [
         ]
     },
     {
+        id: 'survey-hub',
+        name: 'Survey Hub',
+        icon: '📈',
+        emoji: '📈',
+        tools: [
+            'surveybuilder',
+            'mysurveys'
+        ]
+    },
+    {
         id: 'utilities',
         name: 'Utilities',
         icon: '🛠️',
@@ -566,6 +576,31 @@ const tools = [
         name: 'Medicine Reminder',
         icon: '⏰',
         description: 'Generate reminder schedules'
+    },
+    // Survey Hub Tools
+    {
+        id: 'surveybuilder',
+        name: 'Survey Builder',
+        icon: '🛠️',
+        description: 'Create and customize your surveys'
+    },
+    {
+        id: 'mysurveys',
+        name: 'My Surveys',
+        icon: '📋',
+        description: 'Manage your created surveys'
+    },
+    {
+        id: 'publicsurvey',
+        name: 'Public Survey',
+        icon: '🌐',
+        description: 'View and fill out a survey'
+    },
+    {
+        id: 'responseviewer',
+        name: 'Response Viewer',
+        icon: '📊',
+        description: 'View and analyze survey responses'
     }
 ];
 
@@ -577,7 +612,7 @@ const modal = document.getElementById('toolModal');
 const closeBtn = document.getElementById('closeBtn');
 const toolContent = document.getElementById('toolContent');
 const toolTitle = document.getElementById('toolTitle');
-const toast = document.getElementById('toast');
+let toast;
 const backButton = document.getElementById('backButton');
 const backButtonContainer = document.getElementById('backButtonContainer');
 const currentFolderTitle = document.getElementById('currentFolderTitle');
@@ -849,21 +884,29 @@ function registerServiceWorker() {
     window.addEventListener('load', () => {
         const swPath = `${PathManager.getPrefix()}service-worker.js`;
         navigator.serviceWorker.register(swPath).then(reg => {
-            // Check for updates periodically
+            // Check for updates more frequently (every 5 minutes)
             setInterval(() => {
                 reg.update();
-            }, 60 * 60 * 1000); // Check every hour
+            }, 5 * 60 * 1000);
 
             reg.addEventListener('updatefound', () => {
                 const newWorker = reg.installing;
                 newWorker.addEventListener('statechange', () => {
                     if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                        // New content available!
+                        // New version available!
                         console.log('New version detected! Preparing to update...');
                         
-                        // We can show a toast or a confirm
-                        if (confirm('A new version of Infinity Kit is available! Refresh now to update?')) {
+                        // If the user is on the home page and not in a tool, we can reload automatically
+                        const isHomePage = document.getElementById('home-page')?.classList.contains('active');
+                        const isModalOpen = document.getElementById('toolModal')?.style.display === 'block';
+                        
+                        if (isHomePage && !isModalOpen) {
                             window.location.reload();
+                        } else {
+                            // Otherwise, show a less intrusive toast or a confirm
+                            if (confirm('A new version of Infinity Kit is available! Update now?')) {
+                                window.location.reload();
+                            }
                         }
                     }
                 });
@@ -873,6 +916,7 @@ function registerServiceWorker() {
         });
     });
 }
+
 
 
 // Render folder cards
@@ -1374,6 +1418,19 @@ function doOpenTool(toolId, toolName, toolIcon, fromHistory = false) {
         case 'medicinereminder':
             loadMedicineReminder();
             break;
+        // Survey Hub
+        case 'surveybuilder':
+            if (typeof loadSurveyBuilder === 'function') loadSurveyBuilder();
+            break;
+        case 'mysurveys':
+            if (typeof loadMySurveys === 'function') loadMySurveys();
+            break;
+        case 'publicsurvey':
+            if (typeof loadPublicSurvey === 'function') loadPublicSurvey();
+            break;
+        case 'responseviewer':
+            if (typeof loadResponseViewer === 'function') loadResponseViewer();
+            break;
     }
 
     // Track recent tool usage
@@ -1408,6 +1465,15 @@ function closeTool(fromHistory = false) {
 
 // Show toast notification
 function showToast(message, type = 'success') {
+    if (!toast) {
+        toast = document.getElementById('toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'toast';
+            toast.className = 'toast';
+            document.body.appendChild(toast);
+        }
+    }
     toast.textContent = message;
     toast.className = `toast ${type}`;
     toast.style.display = 'block';

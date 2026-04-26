@@ -7,3 +7,7 @@ export const firebaseConfig = {
   appId: "1:513722149352:web:8e2e06b49eba6286b55c5d",
   measurementId: "G-TPHDKEFZER"
 };
+
+export const imgbbConfig = {
+  apiKey: "17e4b0b321133283e368997f48a201e5"
+};

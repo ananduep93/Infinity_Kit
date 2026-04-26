@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Survey - Infinity Kit⚡</title>
+    <link rel="stylesheet" href="../app.css?v=16.7.20260426.1251">
+    <link rel="shortcut icon" href="../icon-192.png?v=16.7.20260426.1251" type="image/png">
+    <style>
+        .tool-page-container { max-width: 700px; margin: 40px auto; padding: 20px; }
+        .public-survey-container { padding: 40px; border-radius: 20px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar"><div class="nav-logo" onclick="location.href='../index.html'">⚡INFINITY KIT</div></nav>
+    <div class="breadcrumb">
+        <a href="../index.html">Home</a><span class="separator">&rsaquo;</span>
+        <a href="../folder/survey-hub.html">Survey Hub</a><span class="separator">&rsaquo;</span>
+        <span class="current">Public Survey</span>
+    </div>
+    <main class="tool-page-container">
+        <a href='../folder/survey-hub.html' class='back-link'><span>&larr;</span> Back to Hub</a>
+        <div id="toolContent">
+            <div class="loading-placeholder">Loading survey...</div>
+        </div>
+    </main>
+    <footer class="footer"><div class="footer-links"><a href="../index.html">Home</a></div></footer>
+
+    <script src="../notifications.js?v=16.7.20260426.1251"></script>
+    <script src="../main.js?v=16.7.20260426.1251"></script>
+    <script type="module" src="../survey-hub.js?v=16.7.20260426.1251"></script>
+    <script>
+        window.toolContent = document.getElementById('toolContent');
+        document.addEventListener('DOMContentLoaded', () => {
+            const pollSync = setInterval(() => {
+                if (typeof loadPublicSurvey === 'function') {
+                    clearInterval(pollSync);
+                    loadPublicSurvey();
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

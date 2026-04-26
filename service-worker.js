@@ -1,4 +1,4 @@
-const CACHE_NAME = 'infinity-kit-v16.7.20260424.2151';
+const CACHE_NAME = 'infinity-kit-v16.7.20260425.1713';
 const CORE_ASSETS = [
     './',
     './index.html',
@@ -13,6 +13,7 @@ const CORE_ASSETS = [
     './main.js',
     './notifications.js',
     './shared-tool.js',
+    './survey-hub.js',
     './sync.js'
 ];
 
@@ -51,19 +52,28 @@ self.addEventListener('fetch', (event) => {
     }
 
     if (event.request.mode === 'navigate') {
+        // Force network for navigation to ensure the latest HTML is fetched
         event.respondWith(
-            fetch(event.request)
+            fetch(event.request, { cache: 'no-store' })
                 .then((networkResponse) => {
-                    const responseClone = networkResponse.clone();
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(event.request, responseClone);
-                    });
+                    if (networkResponse.status === 200) {
+                        const responseClone = networkResponse.clone();
+                        caches.open(CACHE_NAME).then((cache) => {
+                            cache.put(event.request, responseClone);
+                        });
+                    }
                     return networkResponse;
                 })
-                .catch(() => caches.match(event.request).then((cachedPage) => cachedPage || caches.match('./index.html')))
+                .catch(() => {
+                    // Fallback to cache if network fails
+                    return caches.match(event.request).then((cachedPage) => {
+                        return cachedPage || caches.match('./index.html');
+                    });
+                })
         );
         return;
     }
+
 
     event.respondWith(
         caches.match(event.request).then((cachedResponse) => {
