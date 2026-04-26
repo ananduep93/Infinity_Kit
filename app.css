@@ -27,6 +27,11 @@ body {
     min-height: 100vh;
     color: var(--text-color);
     overflow-x: hidden;
+    flex-direction: column;
+}
+
+main, #main-content, .tool-page-container {
+    flex: 1;
 }
 
 /* Navbar */
@@ -93,13 +98,32 @@ body {
 .settings-btn {
     background: none;
     border: none;
-    font-size: 1.5rem;
     cursor: pointer;
-    transition: transform 0.3s;
+    transition: all 0.3s;
     color: var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.settings-btn:hover {
+
+.settings-icon {
+    font-size: 1.5rem;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.settings-text {
+    display: none;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.settings-btn:hover .settings-icon {
     transform: rotate(90deg) scale(1.1);
+}
+
+.settings-btn:hover .settings-text {
+    color: #667eea;
 }
 
 @media (max-width: 768px) {
@@ -760,21 +784,9 @@ body {
     -webkit-user-select: none;
 }
 
-.folder-card.long-pressing {
-    transform: scale(0.98);
-}
 
-.folder-card.favorite-folder {
-    border: 2px solid #ffc107;
-}
 
-.folder-favorite-badge {
-    position: absolute;
-    top: 10px;
-    right: 12px;
-    font-size: 1.1rem;
-    z-index: 2;
-}
+
 
 .folder-card::before {
     content: '';
@@ -2013,8 +2025,23 @@ button:active {
         border-radius: 8px;
     }
 
-    .nav-links a:hover {
+    .nav-links a:hover, .settings-btn:hover {
         background: rgba(102, 126, 234, 0.1);
+    }
+
+    .settings-icon {
+        display: none;
+    }
+
+    .settings-text {
+        display: block;
+    }
+
+    .settings-btn {
+        width: 100%;
+        padding: 8px;
+        border-radius: 8px;
+        text-align: center;
     }
 }
 

@@ -4,14 +4,6 @@ console.log('Infinity Kit Version 16.7 Loaded - Script-Based Path Resolver Activ
 // Folders with Tools Data
 const baseFolders = [
     {
-        id: 'favorites',
-        name: '⭐ Favorites',
-        icon: '⭐',
-        emoji: '⭐',
-        tools: [],
-        isFavorites: true
-    },
-    {
         id: 'daily-essentials',
         name: 'Daily Essentials',
         icon: '🏠',
@@ -153,36 +145,9 @@ let appSettings = {
     usageStats: {}
 };
 
-function getFavoriteFolderIds() {
-    const favoriteIds = Array.isArray(appSettings?.favorites) ? appSettings.favorites : [];
-    return favoriteIds.filter(id => baseFolders.some(folder => folder.id === id && !folder.isFavorites));
-}
-
-// Update folders with favorite-folder tools
+// Update folders (legacy helper, now just clones baseFolders)
 function updateFolders() {
     folders = JSON.parse(JSON.stringify(baseFolders));
-    
-    // Build Favorites folder from tools inside favorite folders
-    const favFolder = folders.find(f => f.isFavorites);
-    if (favFolder) {
-        const favoriteToolIds = [];
-        const seen = new Set();
-        const favoriteFolderIds = getFavoriteFolderIds();
-
-        favoriteFolderIds.forEach(folderId => {
-            const sourceFolder = baseFolders.find(folder => folder.id === folderId && !folder.isFavorites);
-            if (!sourceFolder || !Array.isArray(sourceFolder.tools)) return;
-
-            sourceFolder.tools.forEach(toolId => {
-                if (!seen.has(toolId)) {
-                    seen.add(toolId);
-                    favoriteToolIds.push(toolId);
-                }
-            });
-        });
-
-        favFolder.tools = favoriteToolIds;
-    }
 }
 
 // updateFolders initialized during loadSettings for correctly syncing favorites
@@ -704,6 +669,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof setupPwaInstall === 'function') setupPwaInstall();
         if (typeof registerServiceWorker === 'function') registerServiceWorker();
         if (typeof updateCopyrightYear === 'function') updateCopyrightYear();
+        
+        // Update Settings button to have both icon and text
+        const settingsBtn = document.getElementById('settingsBtn');
+        if (settingsBtn) {
+            settingsBtn.innerHTML = `
+                <span class="settings-icon">&#9881;&#65039;</span>
+                <span class="settings-text">Settings</span>
+            `;
+            settingsBtn.title = 'Open Settings';
+        }
+        
+        // Inject footer on all pages except index.html
+        if (typeof injectGlobalFooter === 'function') injectGlobalFooter();
 
         // Initialize Notification System
         if (window.NotificationManager) {
@@ -928,60 +906,14 @@ function renderFolders() {
         const card = document.createElement('div');
         card.className = 'folder-card';
         const toolCount = Array.isArray(folder.tools) ? folder.tools.length : 0;
-        const isFavoriteFolder = !folder.isFavorites && getFavoriteFolderIds().includes(folder.id);
-        if (isFavoriteFolder) {
-            card.classList.add('favorite-folder');
-        }
+        
         card.innerHTML = `
-            ${isFavoriteFolder ? '<div class="folder-favorite-badge">⭐</div>' : ''}
             <div class="folder-icon">${folder.emoji}</div>
             <div class="folder-name">${folder.name}</div>
             <div class="folder-count">${toolCount} tools</div>
         `;
 
-        let longPressTimer = null;
-        let longPressTriggered = false;
-        const LONG_PRESS_MS = 600;
-
-        const startLongPress = () => {
-            if (folder.isFavorites) return;
-            longPressTriggered = false;
-            card.classList.add('long-pressing');
-            clearTimeout(longPressTimer);
-            longPressTimer = setTimeout(() => {
-                longPressTriggered = true;
-                card.classList.remove('long-pressing');
-                toggleFavoriteFolder(folder.id);
-            }, LONG_PRESS_MS);
-        };
-
-        const cancelLongPress = () => {
-            card.classList.remove('long-pressing');
-            if (longPressTimer) {
-                clearTimeout(longPressTimer);
-                longPressTimer = null;
-            }
-        };
-
-        card.addEventListener('mousedown', startLongPress);
-        card.addEventListener('touchstart', startLongPress, { passive: true });
-        card.addEventListener('mouseup', cancelLongPress);
-        card.addEventListener('mouseleave', cancelLongPress);
-        card.addEventListener('touchend', cancelLongPress);
-        card.addEventListener('touchcancel', cancelLongPress);
-        
-        // Prevent system context menu during long press
-        card.addEventListener('contextmenu', (e) => {
-            if (longPressTriggered) {
-                e.preventDefault();
-            }
-        });
-
         card.addEventListener('click', () => {
-            if (longPressTriggered) {
-                longPressTriggered = false;
-                return;
-            }
             triggerHaptic('light');
             location.href = PathManager.getFolderPath(folder.id);
         });
@@ -1019,36 +951,55 @@ function renderToolsInFolder(folder) {
     if (!toolsGrid) return;
     toolsGrid.innerHTML = '';
     
-    // Tools rendering logic utilizing centralized PathManager
-
-    const folderTools = Array.isArray(folder.tools) ? folder.tools : [];
-    folderTools.forEach(toolId => {
-        const tool = tools.find(t => t.id === toolId);
-        if (!tool) return;
-
-        const card = document.createElement('a');
-        card.className = 'tool-card';
-        card.href = tool.comingSoon ? '#' : PathManager.getToolPath(toolId);
+    const folderItems = Array.isArray(folder.tools) ? folder.tools : [];
+    folderItems.forEach(itemId => {
+        // Try to find as a tool first
+        const tool = tools.find(t => t.id === itemId);
+        const sourceFolder = baseFolders.find(f => f.id === itemId && !f.isFavorites);
         
-        if (tool.comingSoon) {
-            card.style.opacity = '0.6';
-            card.style.cursor = 'not-allowed';
-            card.onclick = (e) => e.preventDefault();
-        }
-        
-        card.innerHTML = `
-            <div class="tool-card-header">
-                <div class="tool-icon">${tool.icon || '🛠️'}</div>
-            </div>
-            <div class="tool-name">${tool.name}</div>
-        `;
-        
-        if (!tool.comingSoon) {
+        if (tool) {
+            const card = document.createElement('a');
+            card.className = 'tool-card';
+            card.href = tool.comingSoon ? '#' : PathManager.getToolPath(itemId);
+            
+            if (tool.comingSoon) {
+                card.style.opacity = '0.6';
+                card.style.cursor = 'not-allowed';
+                card.onclick = (e) => e.preventDefault();
+            }
+            
+            card.innerHTML = `
+                <div class="tool-card-header">
+                    <div class="tool-icon">${tool.icon || '🛠️'}</div>
+                </div>
+                <div class="tool-name">${tool.name}</div>
+            `;
+            
+            if (!tool.comingSoon) {
+                card.addEventListener('click', () => {
+                    triggerHaptic('light');
+                });
+            }
+            toolsGrid.appendChild(card);
+        } else if (sourceFolder) {
+            // Render folder as a card in the favorites view
+            const card = document.createElement('div');
+            card.className = 'folder-card favorite-item-folder';
+            card.style.cursor = 'pointer';
+            
+            card.innerHTML = `
+                <div class="folder-favorite-badge">⭐</div>
+                <div class="folder-icon">${sourceFolder.emoji || '📁'}</div>
+                <div class="folder-name">${sourceFolder.name}</div>
+                <div class="folder-count">${sourceFolder.tools.length} tools</div>
+            `;
+            
             card.addEventListener('click', () => {
                 triggerHaptic('light');
+                location.href = PathManager.getFolderPath(sourceFolder.id);
             });
+            toolsGrid.appendChild(card);
         }
-        toolsGrid.appendChild(card);
     });
 }
 
@@ -4038,12 +3989,6 @@ async function loadSettings() {
         appSettings.favorites = [];
     }
 
-    // Keep only valid folder ids as favorites (no tools, no Favorites folder itself)
-    const validFavoriteFolderIds = new Set(
-        baseFolders.filter(folder => !folder.isFavorites).map(folder => folder.id)
-    );
-    appSettings.favorites = appSettings.favorites.filter(id => validFavoriteFolderIds.has(id));
-
     if (!Array.isArray(appSettings.recentTools)) {
         appSettings.recentTools = [];
     }
@@ -4057,6 +4002,7 @@ async function loadSettings() {
     sessionStorage.removeItem('installed');
 
     updateSettingsUI();
+    updateFolders(); // Ensure folders are updated after settings load
 }
 
 async function saveSettings() {
@@ -4114,37 +4060,6 @@ if (settingsModal) {
 
 
 
-function addFavorite(folderId) {
-    if (!getFavoriteFolderIds().includes(folderId)) {
-        appSettings.favorites.push(folderId);
-        saveSettings();
-        updateFolders();
-        renderFolders();
-        showToast('Folder added to favorites', 'success');
-    }
-}
-
-function removeFavorite(folderId) {
-    appSettings.favorites = getFavoriteFolderIds().filter(id => id !== folderId);
-    saveSettings();
-    updateFolders();
-    renderFolders();
-    showToast('Folder removed from favorites', 'success');
-}
-
-function clearAllFavorites() {
-    if (getFavoriteFolderIds().length === 0) {
-        showToast('No favorites to clear', 'info');
-        return;
-    }
-    if (confirm('Are you sure you want to clear all favorites?')) {
-        appSettings.favorites = [];
-        saveSettings();
-        updateFolders();
-        renderFolders();
-        showToast('All favorite folders cleared', 'success');
-    }
-}
 
 
 function addRecentTool(toolId, toolName) {
@@ -4215,34 +4130,41 @@ function resetAllSettings() {
 
 // ========== SMART FEATURES SYSTEM ==========
 
-// Toggle folder as favorite (triggered by long-press on folder cards)
-function toggleFavoriteFolder(folderId) {
-    const folder = baseFolders.find(f => f.id === folderId && !f.isFavorites);
-    if (!folder) return;
 
-    const favoriteFolderIds = getFavoriteFolderIds();
-    const isAlreadyFavorite = favoriteFolderIds.includes(folderId);
+// Inject Global Footer to all pages
+function injectGlobalFooter() {
+    // Only inject if it's not the main index page (which has its own footer)
+    const isIndex = !window.location.pathname.includes('folder/') && !window.location.pathname.includes('tools/') && !window.location.pathname.includes('survey/');
+    
+    if (isIndex && document.querySelector('body > .footer')) return;
 
-    if (isAlreadyFavorite) {
-        appSettings.favorites = favoriteFolderIds.filter(id => id !== folderId);
-        showToast(`Removed ${folder.name} from favorites`, 'success');
+    let footer = document.querySelector('.footer');
+    const prefix = PathManager.getPrefix();
+    const currentYear = new Date().getFullYear();
+
+    const footerHTML = `
+        <div class="footer-links">
+            <a href="${prefix}index.html#about-page">About</a>
+            <a href="${prefix}index.html#privacy-page">Privacy Policy</a>
+            <a href="${prefix}index.html#terms-page">Terms & Conditions</a>
+            <a href="${prefix}index.html#contact-page">Contact</a>
+            <a href="${prefix}index.html#disclaimer-page">Disclaimer</a>
+        </div>
+
+        <div class="footer-bottom">
+            <p class="footer-brand">Made for everyday tools ⚡</p>
+            <p class="footer-tagline">Built to simplify your digital life ⚡</p>
+            <p id="copyrightText" class="copyright-text">© ${currentYear} Infinity Kit. All rights reserved.</p>
+        </div>
+    `;
+
+    if (footer) {
+        footer.innerHTML = footerHTML;
     } else {
-        appSettings.favorites = [...favoriteFolderIds, folderId];
-        showToast(`Added ${folder.name} to favorites`, 'success');
-    }
-
-    saveSettings();
-    updateFolders();
-    renderFolders();
-
-    // Keep currently open folder in sync
-    if (currentFolder) {
-        const updatedFolder = folders.find(f => f.id === currentFolder.id);
-        if (updatedFolder) {
-            currentFolder = updatedFolder;
-            renderToolsInFolder(currentFolder);
-            backButtonContainer.style.display = 'flex';
-        }
+        footer = document.createElement('footer');
+        footer.className = 'footer';
+        footer.innerHTML = footerHTML;
+        document.body.appendChild(footer);
     }
 }
 

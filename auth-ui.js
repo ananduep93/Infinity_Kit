@@ -24,28 +24,55 @@ export const authUI = {
             const photoURL = user.photoURL;
 
             profileBadge.innerHTML = `
-                <div class="profile-info">
+                <div class="profile-main">
                     <div class="profile-avatar">
                         ${photoURL ? `<img src="${photoURL}" alt="Profile">` : `<span>${userInitial}</span>`}
                     </div>
-                    <div class="profile-details">
+                    <div class="profile-details desktop-only">
                         <span class="profile-name">${user.displayName || 'Infinity User'}</span>
                         <span class="profile-email">${user.email}</span>
                     </div>
+                    <button class="profile-logout-btn desktop-only" title="Logout">
+                        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M16 17v-3H9v-4h7V7l5 5-5 5M14 2a2 2 0 0 1 2 2v2h-2V4H5v16h9v-2h2v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9z"/></svg>
+                    </button>
                 </div>
-                <button class="profile-logout-btn" title="Logout">
-                    <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M16 17v-3H9v-4h7V7l5 5-5 5M14 2a2 2 0 0 1 2 2v2h-2V4H5v16h9v-2h2v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9z"/></svg>
-                </button>
+                <div class="profile-mobile-dropdown">
+                    <div class="dropdown-details">
+                        <span class="dropdown-name">${user.displayName || 'Infinity User'}</span>
+                        <span class="dropdown-email">${user.email}</span>
+                    </div>
+                    <button class="dropdown-logout-btn">
+                        <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M16 17v-3H9v-4h7V7l5 5-5 5M14 2a2 2 0 0 1 2 2v2h-2V4H5v16h9v-2h2v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9z"/></svg>
+                        Logout
+                    </button>
+                </div>
             `;
 
-            profileBadge.querySelector('.profile-logout-btn').onclick = (e) => {
-                e.preventDefault();
-                authService.logout();
-            };
+            // Logout listeners (desktop and mobile)
+            profileBadge.querySelectorAll('.profile-logout-btn, .dropdown-logout-btn').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    authService.logout();
+                };
+            });
 
-            // Insert before settings button
+            // Toggle dropdown on mobile click
+            profileBadge.onclick = (e) => {
+                if (window.innerWidth <= 768) {
+                    profileBadge.classList.toggle('dropdown-active');
+                    e.stopPropagation();
+                }
+            };
+            
+            // Close dropdown when clicking elsewhere
+            document.addEventListener('click', () => {
+                profileBadge.classList.remove('dropdown-active');
+            }, { once: false });
+
+            // Insert after settings button (Swap)
             const settingsBtn = document.getElementById('settingsBtn');
-            navRight.insertBefore(profileBadge, settingsBtn);
+            navRight.insertBefore(profileBadge, settingsBtn ? settingsBtn.nextSibling : null);
         } else {
             // Show Sign In & Sign Up
             const authContainer = document.createElement('div');
@@ -212,6 +239,7 @@ export const authUI = {
                 font-size: 0.9rem;
                 overflow: hidden;
                 border: 2px solid rgba(255, 255, 255, 0.2);
+                color: white;
             }
             .profile-avatar img {
                 width: 100%;
@@ -274,28 +302,90 @@ export const authUI = {
 
             @media (max-width: 768px) {
                 .profile-badge {
-                    margin: 10px 0;
-                    width: 100%;
+                    margin: 0;
+                    width: auto;
                     justify-content: center;
+                    padding: 0;
+                    background: none;
+                    border: none;
+                    position: relative;
+                }
+                .profile-badge:hover { background: none; }
+                
+                .desktop-only { display: none !important; }
+                
+                .profile-main {
+                    padding: 5px;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.1);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                }
+                
+                .profile-avatar {
+                    width: 36px;
+                    height: 36px;
+                }
+
+                .profile-mobile-dropdown {
+                    display: none;
+                    position: absolute;
+                    top: 100%;
+                    right: 0;
+                    width: 180px;
+                    background: rgba(25, 26, 40, 0.95);
+                    backdrop-filter: blur(15px);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 12px;
                     padding: 12px;
-                }
-                .profile-details {
-                    max-width: 150px;
-                }
-                .auth-nav-item {
+                    margin-top: 10px;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+                    z-index: 10002;
                     flex-direction: column;
-                    width: 100%;
-                    gap: 5px;
-                    margin-top: 5px;
+                    gap: 10px;
+                    animation: toastSlideUp 0.3s ease;
                 }
-                .auth-nav-link {
-                    width: 100%;
-                    text-align: center;
-                    padding: 12px !important;
+
+                .profile-badge.dropdown-active .profile-mobile-dropdown {
+                    display: flex;
                 }
-                .signup-link {
-                    width: 100%;
-                    max-width: 200px;
+
+                .dropdown-details {
+                    display: flex;
+                    flex-direction: column;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                    padding-bottom: 8px;
+                }
+
+                .dropdown-name {
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                    color: white;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .dropdown-email {
+                    font-size: 0.7rem;
+                    color: rgba(255, 255, 255, 0.8);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .dropdown-logout-btn {
+                    background: rgba(255, 75, 43, 0.1);
+                    border: none;
+                    color: #ff4b2b;
+                    padding: 8px;
+                    border-radius: 6px;
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    cursor: pointer;
                 }
             }
 
