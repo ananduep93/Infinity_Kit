@@ -4,6 +4,6 @@
   "description": "Infinity Kit Web Tools",
   "main": "main.js",
   "dependencies": {
-    "@google/generative-ai": "^0.1.0"
+    "@google/generative-ai": "latest"
   }
 }

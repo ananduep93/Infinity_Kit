@@ -1,5 +1,3 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-
 module.exports = async (req, res) => {
     // Enable CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -17,58 +15,58 @@ module.exports = async (req, res) => {
     try {
         const { type, message, text, code, helpType, targetLang, prompt } = req.body;
 
-        // Handle Image Generation separately (Free via Pollinations)
+        // 1. Image Generation (Free & No Key) - Already working
         if (type === 'image') {
             const seed = Math.floor(Math.random() * 1000000);
             const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?seed=${seed}&width=1024&height=1024&nologo=true`;
             return res.status(200).json({ result: imageUrl });
         }
 
-        // Handle Text via Gemini
-        if (!process.env.GEMINI_API_KEY) {
-            return res.status(500).json({ error: 'Missing GEMINI_API_KEY in Environment Variables' });
+        // 2. Text Generation (Using Direct Gemini REST API)
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            return res.status(500).json({ error: 'Missing GEMINI_API_KEY. Please set it in Vercel Settings.' });
         }
-
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         let systemPrompt = "You are a helpful assistant part of Infinity Kit.";
         let userPrompt = "";
 
         switch (type) {
-            case 'chat':
-                userPrompt = message;
-                break;
-            case 'improve':
-                systemPrompt = "Improve the following text for clarity and professional tone:";
-                userPrompt = text;
-                break;
-            case 'summarize':
-                systemPrompt = "Summarize the following text concisely:";
-                userPrompt = text;
-                break;
-            case 'code':
-                if (helpType === 'explain') systemPrompt = "Explain this code simply:";
-                else if (helpType === 'fix') systemPrompt = "Fix the errors in this code:";
-                else systemPrompt = "Improve or convert this code:";
-                userPrompt = code;
-                break;
-            case 'translate':
-                systemPrompt = `Translate this text into ${targetLang}:`;
-                userPrompt = text;
-                break;
-            default:
-                return res.status(400).json({ error: 'Invalid request type' });
+            case 'chat': userPrompt = message; break;
+            case 'improve': systemPrompt = "Improve this text:"; userPrompt = text; break;
+            case 'summarize': systemPrompt = "Summarize this text:"; userPrompt = text; break;
+            case 'code': systemPrompt = "Helper for code:"; userPrompt = code; break;
+            case 'translate': systemPrompt = `Translate to ${targetLang}:`; userPrompt = text; break;
+            default: return res.status(400).json({ error: 'Invalid type' });
         }
 
-        const result = await model.generateContent(`${systemPrompt}\n\n${userPrompt}`);
-        const response = await result.response;
-        const resultText = response.text();
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }]
+                }]
+            })
+        });
 
-        return res.status(200).json({ result: resultText });
+        const data = await response.json();
+
+        if (data.error) {
+            throw new Error(data.error.message || 'Gemini API Error');
+        }
+
+        if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+            const resultText = data.candidates[0].content.parts[0].text;
+            return res.status(200).json({ result: resultText });
+        } else {
+            throw new Error('No response from Gemini. Check your API Key or Quota.');
+        }
 
     } catch (error) {
-        console.error('Gemini Error:', error);
+        console.error('Final Error:', error);
         return res.status(500).json({ error: error.message });
     }
 };
