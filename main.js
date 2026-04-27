@@ -134,7 +134,7 @@ const baseFolders = [
         name: 'AI Tools',
         icon: '🤖',
         emoji: '🤖',
-        tools: ['chatbot', 'text-improver', 'summarizer', 'code-helper', 'image-generator', 'translator', 'voice-assistant', 'document-checker']
+        tools: ['chatbot', 'text-improver', 'summarizer', 'image-generator']
     }
 ];
 

@@ -68,16 +68,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname;
     const pageId = path.split('/').pop().replace('.html', '');
     
-    console.log('Initializing tool:', pageId);
-
     if (pageId === 'chatbot') initChatbot();
     else if (pageId === 'text-improver') initTextImprover();
     else if (pageId === 'summarizer') initSummarizer();
-    else if (pageId === 'code-helper') initCodeHelper();
     else if (pageId === 'image-generator') initImageGenerator();
-    else if (pageId === 'translator') initTranslator();
-    else if (pageId === 'voice-assistant') initVoiceAssistant();
-    else if (pageId === 'document-checker') initDocumentChecker();
 });
 
 function initChatbot() {
@@ -142,22 +136,6 @@ function initSummarizer() {
     });
 }
 
-function initCodeHelper() {
-    const helpBtn = document.getElementById('help-btn');
-    const input = document.getElementById('code-input');
-    const output = document.getElementById('code-output');
-    const typeSelect = document.getElementById('help-type');
-    if (!helpBtn) return;
-
-    helpBtn.addEventListener('click', async () => {
-        const code = input.value.trim();
-        const helpType = typeSelect.value;
-        if (!code) return;
-        const response = await AITools.ask('code', { code, helpType });
-        if (response) output.textContent = response;
-    });
-}
-
 function initImageGenerator() {
     const generateBtn = document.getElementById('generate-btn');
     const promptInput = document.getElementById('prompt-input');
@@ -178,116 +156,4 @@ function initImageGenerator() {
             }
         }
     });
-}
-
-function initTranslator() {
-    const translateBtn = document.getElementById('translate-btn');
-    const input = document.getElementById('text-input');
-    const output = document.getElementById('translation-output');
-    const langSelect = document.getElementById('target-lang');
-    if (!translateBtn) return;
-
-    translateBtn.addEventListener('click', async () => {
-        const text = input.value.trim();
-        const targetLang = langSelect.value;
-        if (!text) return;
-        const response = await AITools.ask('translate', { text, targetLang });
-        if (response) output.textContent = response;
-    });
-}
-
-function initVoiceAssistant() {
-    const micBtn = document.getElementById('mic-btn');
-    const statusText = document.getElementById('status-text');
-    const transcriptionDiv = document.getElementById('voice-output');
-    const aiAnswerDiv = document.getElementById('ai-answer');
-    if (!micBtn) return;
-
-    let recognition;
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        recognition = new SpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-
-        recognition.onstart = () => {
-            statusText.textContent = 'Listening...';
-            micBtn.classList.add('recording');
-        };
-
-        recognition.onresult = async (event) => {
-            const transcript = event.results[0][0].transcript;
-            transcriptionDiv.textContent = transcript;
-            statusText.textContent = 'Processing...';
-            
-            const response = await AITools.ask('chat', { message: transcript });
-            if (response) {
-                aiAnswerDiv.textContent = response;
-                statusText.textContent = 'Speaking...';
-                speak(response);
-            }
-        };
-
-        recognition.onerror = () => {
-            statusText.textContent = 'Error occurred. Try again.';
-            micBtn.classList.remove('recording');
-        };
-
-        recognition.onend = () => {
-            micBtn.classList.remove('recording');
-            if (statusText.textContent === 'Speaking...') {
-                // Keep it as speaking
-            } else {
-                statusText.textContent = 'Click to start speaking';
-            }
-        };
-    }
-
-    micBtn.addEventListener('click', () => {
-        if (recognition) {
-            recognition.start();
-        } else {
-            AITools.showError('Voice recognition not supported in this browser.');
-        }
-    });
-
-    function speak(text) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.onend = () => {
-            statusText.textContent = 'Click to start speaking';
-        };
-        window.speechSynthesis.speak(utterance);
-    }
-}
-
-function initDocumentChecker() {
-    const analyzeBtn = document.getElementById('analyze-btn');
-    const fileInput = document.getElementById('file-input');
-    const output = document.getElementById('doc-output');
-    if (!analyzeBtn) return;
-
-    analyzeBtn.addEventListener('click', async () => {
-        const file = fileInput.files[0];
-        if (!file) return AITools.showError('Please select a file first.');
-
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-            const text = e.target.result;
-            const response = await AITools.ask('summarize', { text: text.substring(0, 5000) });
-            if (response) output.textContent = response;
-        };
-        reader.readAsText(file);
-    });
-
-    const dropZone = document.getElementById('drop-zone');
-    if (dropZone) {
-        dropZone.addEventListener('click', () => fileInput.click());
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#4a6cf7'; });
-        dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = '#ddd'; });
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.style.borderColor = '#ddd';
-            fileInput.files = e.dataTransfer.files;
-        });
-    }
 }
